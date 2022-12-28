@@ -1,0 +1,68 @@
+$hf-contain-p: 0 1.2rem;
+$hf-contain-f: 0.76rem;
+$hf-high-color: #0088fe;
+
+// 头部数据统计
+.header-total-box {
+  font-size: $hf-contain-f;
+  color: #333333;
+
+  .header-top {
+    padding: $hf-contain-p;
+    background: #ffffff;
+    padding-top: 0.8rem;
+    padding-bottom: 0.5rem;
+
+    .header-title {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+
+      .title-rt {
+        color: rgb(153, 153, 153);
+      }
+    }
+
+    .title-color-bule {
+      color: $hf-high-color;
+    }
+  }
+
+  .header-bottom {
+    // padding: $hf-contain-p;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background: #ffffff;
+
+    .header-num {
+      padding: $hf-contain-p;
+      display: flex;
+      flex-wrap: wrap;
+      padding-top: 0.3rem;
+
+      .item-num {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        color: #333333;
+        flex: 1;
+        margin-right: 0.3rem;
+
+        .num-top {
+          font-size: 1rem;
+        }
+
+        .num-bottom {
+          font-weight: bold;
+          margin-top: 0.2rem;
+        }
+      }
+    }
+  }
+
+
+  // .header-num {
+  //   margin-top: 1rem;
+  // }
+}

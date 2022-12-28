@@ -1,0 +1,56 @@
+.order-van-popup-box {
+  padding: 0.5rem;
+  //  position: relative;
+  .form {
+    margin-top: 1rem;
+  }
+
+  .form-header {
+    font-size: 1rem;
+    // position: absolute;
+    font-size: bold;
+    top: 3rem;
+    // left: 0.6rem;
+    // padding: 0.2rem;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .form-content {
+    line-height: 1.5rem;
+    div {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+  }
+
+  .form-footer {
+    width: 38%;
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+
+    .btn {
+      border-radius: 0.5rem;
+    }
+
+    margin-top: 1rem;
+  }
+
+  .elt-ft {
+    width: 20%;
+  }
+
+  .elt-fe {
+    // font-size: 0.6rem;
+  }
+  .elt-mt {
+    margin-top: 3rem;
+  }
+}
+.elet-box {
+  width: 40%;
+  box-sizing: border-box;
+}

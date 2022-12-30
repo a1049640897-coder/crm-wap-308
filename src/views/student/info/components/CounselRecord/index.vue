@@ -9,9 +9,11 @@
           </div>
         </div>
         <div class="counselRecord-content">
-          <span class="content-text" v-if="item.courseNames">{{item.courseNames}}：{{item.content||'暂无'}}</span>
+          <span class="content-text" v-if="item.courseNames || item.content"><span v-if="item.courseNames">{{item.courseNames}}</span><span v-if="item.courseNames && item.content">：</span><span v-if="item.content">{{item.content}}</span></span>
           <div class="content-imgs" v-if="item.imgList && item.imgList.length">
-            <img :src="it.title" alt="" v-for="(it, index) in item.imgList" :key="it.id" v-permission="'PG:STU:RECORD_EDIT'" @click="handleImageView(index, item.imgList)" />
+            <div v-for="(it, index) in item.imgList" :key="it.id" v-permission="'PG:STU:RECORD_EDIT'" @click="handleImageView(index, item.imgList)" style="padding: 0 0.76rem 0.76rem 0;">
+              <img :src="it.title" alt="" />
+            </div>
           </div>
           <div class="content-info">
             <span>{{item.addTime}}</span>
@@ -59,10 +61,10 @@ export default {
   methods: {
     getTableList() {
       return new Promise(resolve => {
-        // this.recordList = []
         this.loading = true
         consultRecordHistoryApi(this.sId).then(res => {
           this.recordList = res.data || []
+          this.$emit('listLength', this.recordList.length)
           resolve()
         }).finally(() => {
           this.loading = false
@@ -123,8 +125,6 @@ export default {
             border-radius: 0.3rem;
             width: 3.6rem;
             height: 3.6rem;
-            margin-right: 0.76rem;
-            margin-bottom: 0.76rem;
           }
           :nth-child(5n) {
             margin-right: 0;

@@ -3,7 +3,7 @@
     <div class="activeRecord-list" v-if="activeList && activeList.length">
       <div class="activeRecord-list-item" v-for="(item, index) in activeList" :key="index">
         <div class="activeRecord-header">
-          <div class="activeRecord-title">{{item.activityDate}}</div>
+          <div class="activeRecord-title">{{item.participationDate}}</div>
           <div class="activeRecord-extra">第{{index + 1}}次参与</div>
         </div>
         <div class="activeRecord-content">
@@ -73,7 +73,7 @@ export default {
         this.loading = true
         activeRecordListApi(this.listQuery).then(res => {
           let list = res.data || []
-          this.activeList = list.filter(item => item)
+          this.activeList = list.filter(item => item).reverse()
           resolve()
         }).finally(() => {
           this.loading = false

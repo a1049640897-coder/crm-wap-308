@@ -176,6 +176,7 @@ export default {
     handleDataInit() {
       if (this.isEdit) {
         const { id, type } = this.costData || {}
+        console.log('id, type', id, type);
         activityDetailGetApi(id, type).then(res => {
           this.costInfoList = [res.data]
           this.handleCost(type, 0)

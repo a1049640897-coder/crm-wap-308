@@ -7,8 +7,6 @@ import consultation from './modules/consultation.js'
 import activity from './modules/activity.js'
 import handover from './modules/handover.js'
 import baiduCode from './modules/baiduCode.js'
-import order from './modules/order.js'
-import course from './modules/course.js'
 
 
 Vue.use(Vuex)
@@ -20,9 +18,7 @@ export default new Vuex.Store({
     consultation,
     activity,
     handover,
-    baiduCode,
-    order,
-    course
+    baiduCode
   },
   getters
 })

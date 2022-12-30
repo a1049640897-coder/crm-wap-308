@@ -105,7 +105,8 @@ export default {
   props: {
     listType: String,
     paramProp: Object,
-    filterProp: Object // 移交筛选title的参数
+    filterProp: Object, // 移交筛选title的参数
+    moreActLecture: Object,
   },
   components: {
     ReQuickDateBtns: () => import('@/components/ReComponents/ReQuickDateBtns'),
@@ -250,9 +251,9 @@ export default {
     }),
     isMoreAct() {
       let bol = false
-      const listQuery = this.listQuery || {}
+      const listQuery = this.moreActLecture || {}
       const { handoverShellId, handoverUserId, handoverType, targetSysId, targetShellId, targetUserId } = listQuery
-      if (handoverShellId || handoverUserId && handoverUserId.length || handoverType || targetSysId || targetShellId && targetShellId.length || targetUserId && targetUserId.length) {
+      if (handoverShellId && handoverShellId.length || handoverUserId && handoverUserId.length || handoverType || targetSysId || targetShellId && targetShellId.length || targetUserId && targetUserId.length) {
         bol = true
       }
       return bol
@@ -272,11 +273,6 @@ export default {
       if (this.listQuery.result && this.listQuery.result.length) isShow = true
       return isShow
     },
-    isHtab4() {
-      let isShow = false
-      if (this.listQuery.intentionType && this.listQuery.intentionType.length) isShow = true
-      return isShow
-    }
   },
   created() {
     // this.useGetGenerousList()
@@ -413,7 +409,7 @@ export default {
     },
 
     handleDateSelect(val) {
-      if (val.filter(item => item).length) {
+      if (val.filter(item => item).length === 2) {
         // dateType 1: 移交日期 2 报名日期
         if (this.listQuery.dateType == 1) {
           this.listQuery.beginDate = dayjs(val[0]).format('YYYY/MM/DD')
@@ -427,7 +423,9 @@ export default {
     // 日历重置
     handleDateReset() {
       this.defaultDate = null
-      this.$refs.vanCalendar && this.$refs.vanCalendar.reset()
+      this.$nextTick(() => {
+        this.$refs.vanCalendar && this.$refs.vanCalendar.reset()
+      })
     },
     handleReset(num) {
       if (num === 1) {
@@ -437,9 +435,12 @@ export default {
       } else if (num === 3) {
         this.listQuery.result = []
       } else if (num === 4) {
-        this.listQuery.intentionType = []
-        this.listQuery.startDate = null
+        this.listQuery.signUpBegin = null
+        this.listQuery.signUpEnd = null
+        this.listQuery.dateType = 1
+        this.listQuery.beginDate = null
         this.listQuery.endDate = null
+        this.handleDateReset()
       }
       // const obj = JSON.parse(JSON.stringify(this.paramProp))
     },

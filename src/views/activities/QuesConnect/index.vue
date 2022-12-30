@@ -25,7 +25,7 @@
         </template>
       </van-field>
       <div class="ques-connnect-btn">
-        <van-button class="connnect-btn" type="danger" native-type="button" :loading="loading" plain @click="handleDel" v-permission="checkPermissionStatus($route.query.counselTab)" v-if="isEdit">删除</van-button>
+        <van-button class="connnect-btn" type="danger" native-type="button" :loading="loading" plain @click="handleDel" v-permission="checkPermissionStatus()" v-if="isEdit">删除</van-button>
         <van-button class="connnect-btn" type="info" native-type="button" @click="handleReview" :loading="loading">预览</van-button>
         <van-button class="connnect-btn" type="info" native-type="button" @click="handleConfirm" :loading="loading">保存</van-button>
       </div>
@@ -42,7 +42,7 @@ import {
 } from '@/api/potentialGuest/activity'
 import { Notify, Dialog, Toast } from 'vant'
 export default {
-  name: '',
+  name: 'activities-QuesConnect',
   data() {
     return {
       listQuery: {
@@ -80,8 +80,8 @@ export default {
 
 
   methods: {
-    checkPermissionStatus(counselTab) {
-      if (counselTab == 'LectureReg') {
+    checkPermissionStatus() {
+      if (sessionStorage.getItem('counselTab') == 'LectureReg') {
         return 'MARKET:SCHOOL:INFO_DEL'
       } else {
         return 'MARKET:ACT:SCHOOL:INFO_DEL'
@@ -91,6 +91,24 @@ export default {
       Toast('文件大小不能超过 5M');
     },
     handleQueChange(val) {
+    },
+
+    handleOptions(type) {
+      if (!type) {
+        if (Array.isArray(this.shellOptions) && this.shellOptions.length == 1) {
+          this.$set(this.listQuery, 'sysShellId', this.shellOptions[0].value)
+          this.isDisabled = true
+        } else {
+          this.isDisabled = false
+        }
+      } else {
+        if (Array.isArray(this.marketOptions) && this.marketOptions.length == 1) {
+          this.$set(this.listQuery, 'marketAreaId', this.marketOptions[0].id)
+          this.isDisabled = true
+        } else {
+          this.isDisabled = false
+        }
+      }
     },
 
     // type 0 非市场标识 1 市场标识
@@ -107,25 +125,13 @@ export default {
             catory: res.data.catory && res.data.catory[0],
             answerPattern: res.data.answerPattern && res.data.answerPattern.toString(),
           }
-          if (!type) {
-            if (Array.isArray(this.shellOptions) && this.shellOptions.length == 1) {
-              this.$set(this.listQuery, 'sysShellId', this.shellOptions[0].value)
-              this.isDisabled = true
-            } else {
-              this.isDisabled = false
-            }
-          } else {
-            if (Array.isArray(this.marketOptions) && this.marketOptions.length == 1) {
-              this.$set(this.listQuery, 'marketAreaId', this.marketOptions[0].id)
-              this.isDisabled = true
-            } else {
-              this.isDisabled = false
-            }
-          }
-
+          this.handleOptions(type)
           res.data.catory && this.handlecolumn(this.listQuery.catory, 1)
           this.bg = this.listQuery.bgImgUrl ? [{ url: this.listQuery.bgImgUrl }] : []
           this.successPage = this.listQuery.resultImgUrl ? [{ url: this.listQuery.resultImgUrl }] : []
+        } else {
+          console.log('2', type);
+          this.handleOptions(type)
         }
       })
     },
@@ -167,7 +173,8 @@ export default {
     handleReview() {
       this.loading = true
       this.$refs.quesConnect.validate().then(() => {
-        this.$router.push(`/QuersionRead/${this.quesId ? this.quesId : this.listQuery.questionnaire}`)
+        this.loading = false
+        this.$router.push(`/QuersionRead/${this.quesId ? this.quesId : this.listQuery.questionnaire}/${this.$route.params.activitiId}`)
       }).catch(() => {
         this.loading = false
       })
@@ -187,6 +194,7 @@ export default {
       queryShellOptions: 'activity/queryShellOptions',
     }),
     ...mapMutations('activity/', ['SET_QUESOBJ', 'SET_QUESISUPDATE', 'SET_ACTIVITYSTATE']),
+    ...mapMutations('common/global', ['SET_ACTIVITYID']),
     handleInit() {
       const { activitiId } = this.$route.params
       getActivityShellOptionApi(activitiId).then(res => {
@@ -248,9 +256,10 @@ export default {
             this['SET_QUESOBJ']({
               counselTab: this.$route.query.counselTab,
               id: Number(activitiId),
-              sysShellId: this.listQuery.sysShellId,
+              sysShellId: this.roleFlag == 2 ? this.listQuery.marketAreaId : this.listQuery.sysShellId,
               quesConnectObjIsUpdate: true
             })
+            this['SET_ACTIVITYID']({ activityId: Number(activitiId) })
             this.$router.go(-2)
           } else {
             this.handleUpdateQues()

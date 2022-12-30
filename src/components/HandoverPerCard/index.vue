@@ -91,7 +91,6 @@
 <script>
 import dayjs from 'dayjs'
 import { mapState } from 'vuex'
-import { consultationInfoApi } from '@/api/potentialGuest/consultation'
 
 export default {
   props: {
@@ -153,7 +152,6 @@ export default {
       system_hy_jc_wx: [62, 1, 47],
       // 专升本 聚创专插本 江西聚创专升本 公务员
       system_zsb_jczsb_jxzsb_gwy: [49, 76, 77, 22],
-      jumoStudentId: null,
       reserveConsultId: null,
       titleList: ['移交', '承接', '分配', '报名', '收款']
     }
@@ -193,11 +191,6 @@ export default {
       return dayjs(date).format('YYYY/MM/DD')
     }
   },
-  activated() {
-    if (this.jumoStudentId) {
-      this.handleUpdataInfo()
-    }
-  },
   mounted() {
     this.$emit('onStudentCardMounted')
   },
@@ -228,112 +221,6 @@ export default {
     }
   },
   methods: {
-    filterConsultRecordList(list) {
-      if (list) {
-        return list[0]
-      } else {
-        return {}
-      }
-    },
-    filterHandoverInfoMap(obj) {
-      if (obj) {
-        let objList = []
-        for (let item in obj) {
-          objList.push({
-            title: this.titleList[Number(item - 1)],
-            text: obj[item]
-          })
-        }
-        return objList
-      } else {
-        return []
-      }
-    },
-    handoverStateFilter(v) { // 移交状态返回文本
-      const obj = this.isHandoverStateList.find(e => v == e.value)
-      if (!obj) return ''
-      return obj.text
-    },
-    handleRotate() {
-      this.isRotate = !this.isRotate
-    },
-
-    handlePopSelect(e) {
-      if (e.dialogName === 'isConsultSubscribeShow') {
-        if (this.studentData.state === 3) {
-          this.$fm('已完成预约！')
-          return
-        }
-      } else if (e.dialogName === 'editStudent') {
-        // this.handleStudentInfo()
-        this.showPopover = false
-        return
-      } else if (e.dialogName === 'addCounselRecord') {
-        this.showPopover = false
-        this.$nextTick(() => {
-          this.handleConsulRecord()
-        })
-        return
-      }
-      this.reserveConsultId = this.listType === 'yuYueZiXun' ? this.studentData.id : this.studentData.reserveConsultId
-      this[e.dialogName] = true
-    },
-
-    handlePhone() {
-    },
-
-    handleGetSea() {
-      if ([1, 3].includes(this.roleFlag)) {
-        this.$fm('只有咨询或教务才可领取')
-        return
-      }
-      this.isGetConsultSeaShow = true
-    },
-
-    handleStudentInfo() {
-      if (this.isDetail || this.showPopover) return
-      this.jumoStudentId = this.sId
-      this.$router.push(`/studentinfo/${this.sId}/null`)
-    },
-
-    handleAddConsulResult() {
-      this.isConsultSubscribeResultShow = true
-    },
-
-    handleConsulRecord() {
-      this.jumoStudentId = this.sId
-      this.$router.push({
-        path: `/counselrecord/${this.sId}/null`
-      })
-    },
-
-    handleEditStudentInfo() {
-      this.jumoStudentId = this.sId
-      this.$router.push({
-        path: `/studentinfoedit/${this.sId}`
-      })
-    },
-
-    handleUpdataInfo() {
-      consultationInfoApi(this.sId).then(res => {
-        let info = res.data
-        if (this.listType === 'yuYueZiXun') {
-          info.id = this.studentData.id
-          info.studentId = this.studentData.studentId
-        }
-        setTimeout(() => {
-          this.$emit('onComplete', info)
-          this.$emit('onUpdataInfo', info)
-        }, 2000)
-        this.jumoStudentId = null
-      }).catch(() => {
-        this.jumoStudentId = null
-      })
-    },
-
-    handleUpFollow() {
-      this.$emit('onAllRefresh')
-    }
   }
 }
 </script>

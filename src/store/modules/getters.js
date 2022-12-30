@@ -6,7 +6,6 @@ const getters = {
   authorization: state => state.common.user.authorization,
   isAdmin: state => state.common.permission.isAdmin, // 超级权限
   permission_btns: state => state.common.permission.btns, // 按钮权限数据
-  currentSystemInfo: state => state.common.setting.currentSystemInfos, // 判断系统列表
 }
 
 export default getters

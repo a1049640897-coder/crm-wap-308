@@ -96,10 +96,6 @@ export default {
   .drag-header {
     display: flex;
     justify-content: space-between;
-    .darg-header-title {
-    }
-    .darg-header-img {
-    }
   }
   .drag-list {
     flex: 1;

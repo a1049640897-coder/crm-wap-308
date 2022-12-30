@@ -5,7 +5,7 @@
         <div class="common-popup-header">
           <div></div>
           <div class="common-popup-header-title">
-            <span>修改市场区域{{markerAreaId}}</span>
+            <span>修改市场区域</span>
           </div>
           <div></div>
         </div>
@@ -14,7 +14,7 @@
             <p>修改市场区域后，系统会重新关联对应的负责人，可能导致原来的市场区域负责人看不到该潜在用户</p>
           </div>
           <van-form ref="ConsultMarketAreaForm" @submit="handleConfirm" :show-error-message="false" validate-trigger="onSubmit">
-            <RePick ref="markerAreaIdRef" v-model="listQuery.markerAreaId" label="市场区域" :list="marketAreaList" name="markerAreaId" isShowSearch isRequrie isCell />
+            <RePick ref="markerAreaIdRef" v-model="listQuery.markerAreaId" label="市场区域" :list="marketAreaList" name="markerAreaId" isShowSearch isRequrie isCell :disabled="marketAreaList.length === 1" />
             <div class="common-popup-footer">
               <van-button style="width: 8rem; margin-right: 1rem;" native-type="button" @click="handleClose">取消</van-button>
               <van-button type="info" style="width: 8rem;" native-type="submit">修改</van-button>

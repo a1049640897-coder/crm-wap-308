@@ -4,25 +4,29 @@
       <div class="student-info-edit-title">
         <span>必填信息</span>
       </div>
-      <RePick v-if="!sId" v-model="listQuery.entity.sysShellId" label="所属分校" :list="shellList" @change="handleSysShellId" isShowSearch isCascader name="sysShellId" childrenKey="child" isRequrie isCell clearable />
-      <RePick v-if="!sId && roleFlag !== 2" v-model="listQuery.entity.belongSysShellId" label="所属部门" :placeholder="!listQuery.entity.sysShellId ? '请先选择所属分校':'请选择'" :disabled="!listQuery.entity.sysShellId" :list="departList" isShowSearch idKey="value" titleKey="text" name="belongSysShellId" isRequrie isCell clearable />
+      <RePick v-if="!sId && !$route.query.onlyReadObj" v-model="listQuery.entity.sysShellId" label="所属分校" :list="shellList" @change="handleSysShellId" isShowSearch isCascader name="sysShellId" childrenKey="child" :disabled="shellList.length === 1 && (!shellList[0].hasChildren || shellList[0].child.length === 1)" isRequrie isCell clearable />
+      <van-field v-if="$route.query.onlyReadObj" v-model="$route.query.onlyReadObj.shell" clear-trigger="always" input-align="right" label="所属分校" disabled maxlength="50" placeholder="请输入" />
+
+      <RePick v-if="!sId && roleFlag !== 2" v-model="listQuery.entity.belongSysShellId" label="所属部门" :placeholder="!listQuery.entity.sysShellId ? '请先选择所属分校':'请选择'" :disabled="!listQuery.entity.sysShellId || departList.length === 1" :list="departList" isShowSearch idKey="value" titleKey="text" name="belongSysShellId" isRequrie isCell clearable />
       <RePick v-model="listQuery.entity.crmMarketAreaId" label="市场区域" :placeholder="!listQuery.entity.sysShellId ? '请先选择所属分校': !areaList.length ?'请先补充市场区域':'请选择'" :disabled="!listQuery.entity.sysShellId || !areaList.length || areaList.length === 1" :list="areaList" isShowSearch name="crmMarketAreaId" isRequrie isCell clearable @change="handlemarketAreaSelect" />
       <van-field v-model.trim="listQuery.entity.name" clear-trigger="always" name="name" required clearable input-align="right" label="学生姓名" maxlength="50" placeholder="请输入" :rules="[
         { required: true, message: '请输入' }
       ]" />
       <van-field v-model.trim="listQuery.entity.realName" clear-trigger="always" name="realName" clearable input-align="right" label="真实姓名" maxlength="50" placeholder="请输入" />
-      <van-field v-model="listQuery.entity.mobile" :rules="[{ validator: VerifyFunc.poPhone, message: '请输入' }]" @blur="verityHasUser" clear-trigger="always" maxlength="11" clearable input-align="right" type="tel" label="手机号码" name="mobile" placeholder="请输入" />
-      <van-field v-model="listQuery.entity.qqNumber" :rules="[{ validator: VerifyFunc.qq, message: '请输入' }]" @blur="verityHasUser" clear-trigger="always" clearable input-align="right" type="tel" label="QQ" maxlength="50" name="qqNumber" placeholder="请输入" />
-      <van-field v-model="listQuery.entity.wxNumber" :rules="[{ validator: VerifyFunc.wx, message: '请输入' }]" @blur="verityHasUser" clear-trigger="always" clearable input-align="right" label="微信" maxlength="50" name="wxNumber" placeholder="请输入" />
+      <van-field v-model="listQuery.entity.mobile" :rules="[{ validator: VerifyFunc.poPhone, message: '请输入' }]" @change="verityHasUser" clear-trigger="always" maxlength="11" clearable input-align="right" type="tel" label="手机号码" name="mobile" placeholder="请输入" />
+      <van-field v-model="listQuery.entity.qqNumber" :rules="[{ validator: VerifyFunc.qq, message: '请输入' }]" @change="verityHasUser" clear-trigger="always" clearable input-align="right" type="tel" label="QQ" maxlength="50" name="qqNumber" placeholder="请输入" />
+      <van-field v-model="listQuery.entity.wxNumber" :rules="[{ validator: VerifyFunc.wx, message: '请输入' }]" @change="verityHasUser" clear-trigger="always" clearable input-align="right" label="微信" maxlength="50" name="wxNumber" placeholder="请输入" />
       <ReYear v-if="!([50].includes(systemId)) && isRequireYear" v-model="listQuery.entity.graduationYear" name="graduationYear" clearable :isRequrie="isRequireYear" title="毕业年份" label="毕业年份" @change="changeGraduationYear" :rules="[{ required: isRequireYear, message: '请选择' }]" />
       <ReYear v-if="!([50].includes(systemId)) && ([70].includes(systemId))" v-model="listQuery.entity.examYear" name="examYear" clearable :isRequrie="[70].includes(systemId)" :title="examYearText" :label="examYearText" />
       <RePick v-if="systemId === 50" v-model="listQuery.entity.education" label="当前学历" :list="xueLiList" name="education" :isRequrie="systemId === 50" idKey="id" titleKey="text" isCell clearable />
       <div v-if="isRequireSchoolId" class="common-mbLine">
         <RePick v-model="listQuery.entity.attributeId" label="院校属性" :list="schoolTypeList" @change="handleSchoolType" name="attributeId" :isRequrie="isRequireSchoolId" isCell clearable />
-        <RePick v-model="listQuery.entity.goSchoolId" label="就读学校" :list.sync="schoolList" ref="goSchoolRef" @change="handleSchool" isShowSearch isOriginSchool :originSchoolAttr="listQuery.entity.attributeId" name="goSchoolId" originSchoolType="1" :isRequrie="isRequireSchoolId" isCell clearable />
-        <RePick v-model="listQuery.entity.majorId" label="院系/专业" :list.sync="professionList" ref="majorRef" @change="handleSchoolAndMajorMarketArea" isShowSearch isOriginSchool :originSchoolAttr="listQuery.entity.goSchoolId" name="majorId" originSchoolType="2" :isRequrie="[1].includes(this.systemId)" isCell clearable />
+        <RePick v-model="listQuery.entity.goSchoolId" label="就读学校" :list.sync="schoolList" ref="goSchoolRef" @change="handleSchool" isShowSearch isOriginSchool :originSchoolAttr="listQuery.entity.attributeId" name="goSchoolId" originSchoolType="1" v-if="listQuery.entity.attributeId != -1" :isRequrie="isRequireSchoolId" isCell clearable />
+        <RePick v-model="listQuery.entity.majorId" label="院系/专业" :list.sync="professionList" ref="majorRef" @change="handleSchoolAndMajorMarketArea" isShowSearch isOriginSchool :originSchoolAttr="listQuery.entity.goSchoolId" name="majorId" originSchoolType="2" v-if="listQuery.entity.attributeId != -1" :isRequrie="[1].includes(this.systemId)" isCell clearable />
       </div>
-      <RePick v-model="listQuery.entity.crmSourceChannelId" label="来源渠道" :list="sourceChannelList" isShowSearch isCascader name="crmSourceChannelId" isRequrie isCell clearable isLastSelect />
+      <RePick v-if="!$route.query.onlyReadObj" v-model="listQuery.entity.crmSourceChannelId" label="来源渠道" :list="sourceChannelList" isShowSearch isCascader name="crmSourceChannelId" isRequrie isCell clearable isLastSelect />
+      <van-field v-else v-model="$route.query.onlyReadObj.crmSourceChannelName" clear-trigger="always" input-align="right" label="来源渠道" disabled maxlength="50" placeholder="请输入" />
+
       <div class="student-info-edit-title" @click="handleExpend">
         <span>选填信息</span>
         <div style="vertical-align: middle;">
@@ -117,13 +121,15 @@
 </template>
 
 <script>
-import { branchUnitTree, getSchoolMarketAreaApi, getRoleMarketAreaApi, sourceCascadeApi, getAcitveMaterialList, getAcitveCourseList, getEnrollSubjectDrop, addClient, editClientApi, getStudentAttrApi } from '@/api/potentialGuest/studentInfoEdit'
+import { branchUnitTree, getSchoolMarketAreaApi, getRoleMarketAreaApi, sourceCascadeApi, getAcitveMaterialList, getAcitveCourseList, getEnrollSubjectDrop, addClient, getStudentAttrApi } from '@/api/potentialGuest/studentInfoEdit'
 import { departmentSeaApi } from '@/api/potentialGuest/consultation'
-import { verifyUserApi, detailClientApi } from '@/api/potentialGuest/counselRecord'
+import { verifyUserApi, detailClientApi, editClient } from '@/api/potentialGuest/counselRecord'
 import { commonCascadeApi, infoSetApi } from '@/api/common'
+import { addPartPoUser } from '@/api/potentialGuest/activity'
+
 import VerifyFunc from '@/utils/verify'
 import { commonSchoolInfohandle } from '@/utils'
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import { Dialog } from 'vant'
 import dayjs from 'dayjs'
 export default {
@@ -251,6 +257,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('activity', ['SET_PARTACTID', 'SET_PARTUSERUPDATE']),
     handlemarketAreaSelect(val) {
       if (this.marketRoleFlag) this.originalMarketAreaId = val
     },
@@ -341,13 +348,15 @@ export default {
     },
     handleDetail() {
       detailClientApi(this.sId).then(res => {
-        const { id, sysShellId, belongSysShellId, crmMarketAreaId, name, realName, mobile, qqNumber, wxNumber, crmSourceChannelId, commonSchoolInfo, graduationYear, education, examYear, cityId, isAllowAllot, remark, sex } = res.data
+        const { id, sysShellId, belongSysShellId, crmMarketAreaId, crmMarketAreaTitle, name, realName, mobile, qqNumber, wxNumber, crmSourceChannelId, commonSchoolInfo, graduationYear, education, examYear, cityId, isAllowAllot, remark, sex } = res.data
         const extend = res.data || {}
         this.listQuery.entity.id = id
         this.listQuery.entity.sysShellId = sysShellId
-        this.handleSysShellId(sysShellId)
+        this.handleSysShellId(sysShellId, crmMarketAreaId)
         this.listQuery.entity.belongSysShellId = belongSysShellId
         this.listQuery.entity.crmMarketAreaId = crmMarketAreaId
+        this.listQuery.entity.crmMarketAreaTitle = crmMarketAreaTitle
+        this.areaList = [{ id: crmMarketAreaId, title: crmMarketAreaTitle }]
         this.listQuery.entity.name = name
         this.listQuery.entity.realName = realName
         this.listQuery.entity.mobile = mobile
@@ -392,6 +401,7 @@ export default {
         // 处理扩展信息
         this.listQuery.extend = {
           ...extend,
+          ...extend.extend,
           materialIds: extend.materialIds || [],
           courseIds: extend.extend || [],
           registerSubjectLocal: registerSubject.split('、').map(item => {
@@ -406,13 +416,24 @@ export default {
 
     handleInitApi() {
       // 所属分校
-      branchUnitTree().then(res => {
-        this.shellList = res.data || []
-        if (this.shellList.length === 1 && !this.shellList[0].hasChildren) {
-          this.listQuery.entity.sysShellId = this.shellList[0].id
-          if (this.roleFlag !== 2) this.handleSysShellId(this.shellList[0].id)
-        }
-      })
+
+      if (!this.$route.query.onlyReadObj) {
+        branchUnitTree().then(res => {
+          this.shellList = res.data || []
+          if (this.shellList.length === 1 && !this.shellList[0].hasChildren) {
+            this.listQuery.entity.sysShellId = this.shellList[0].id
+            this.handleSysShellId(this.shellList[0].id)
+          } else if (this.shellList.length === 1 && this.shellList[0].child.length === 1) {
+            this.listQuery.entity.sysShellId = this.shellList[0].child[0].id
+            this.handleSysShellId(this.shellList[0].child[0].id)
+          }
+        })
+      } else {
+        const { shellId } = this.$route.query.onlyReadObj
+        this.listQuery.entity.sysShellId = shellId
+        this.handleSysShellId(shellId)
+      }
+
 
       // 获取来源级联
       sourceCascadeApi(1).then(res => {
@@ -451,11 +472,15 @@ export default {
       })
     },
 
-    handleSysShellId(e) {
+    handleSysShellId(e, crmMarketAreaId = null) {
       this.listQuery.entity.belongSysShellId = null
       this.departList = []
-      this.listQuery.entity.crmMarketAreaId = null
-      this.areaList = []
+      if (crmMarketAreaId) {
+        this.listQuery.entity.crmMarketAreaId = crmMarketAreaId
+      } else {
+        this.listQuery.entity.crmMarketAreaId = null
+        this.areaList = []
+      }
       if (e) {
         this.listQuery.entity.belongSysShellId = ''
         if (this.listQuery.entity.sysShellId) {
@@ -466,6 +491,7 @@ export default {
             }
           })
         }
+        if (crmMarketAreaId) return
         if (this.currentStudentsFlag) { // 在校生
           const { goSchoolId, majorId } = this.listQuery.entity
           const value = majorId && majorId !== -1 ? majorId : goSchoolId && goSchoolId !== -1 ? goSchoolId : null
@@ -480,9 +506,7 @@ export default {
         this.areaList = []
       }
     },
-
-    // 校验是否存在
-    verityHasUser() {
+    verityHasUser: debounceFun(function () {
       if (this.loading) return
       const { mobile, wxNumber, qqNumber } = this.listQuery.entity
       let newMobile, newQQ, newWx;
@@ -516,6 +540,7 @@ export default {
               title: '温馨提示',
               message: res.data.userStr,
               confirmButtonText: '查看档案',
+              showConfirmButton: !!res.data.id,
               beforeClose: (action, done) => {
                 if (action === 'confirm') {
                   done()
@@ -538,7 +563,7 @@ export default {
           this.loading = false
         })
       }
-    },
+    }, 300, false),
     setSchoolMajor(obj, type) {
       if (type === 0) {
         this.listQuery.entity.attributeId = obj ? obj.value : null
@@ -637,9 +662,14 @@ export default {
             }).map(item => item.title).join('、')
           }
           if (this.sId) {
-            editClientApi(form).then(res => {
+            editClient(form).then(res => {
               this.$sm(res.data.title)
               this.loading = false
+
+              // 参与人员编辑
+              // if (this.$route.query.flag) {
+              //   this['SET_PARTACTID']({ activityPartId: this.sId })
+              // }
               this.handleBack()
             }).catch(() => {
               this.loading = false
@@ -654,12 +684,25 @@ export default {
                   this.loading = false
                   // 向上更新
                 } else if (this.potentialType === 'potential') {
-                  addClient(form).then(res => {
-                    this.$sm(res.data.title)
-                    resolve(res.data)
-                  }).catch(() => {
-                    this.loading = false
-                  })
+                  // 参与人员添加潜在用户
+                  const { sid } = this.$route.query
+                  if (sid) {
+                    addPartPoUser(form, sid).then(res => {
+                      console.log('添加参与人员中....');
+                      this['SET_PARTUSERUPDATE']({ activityPartIsUpdate: true })
+                      this.$sm(res.data.title)
+                      resolve(res.data)
+                    }).catch(() => {
+                      this.loading = false
+                    })
+                  } else {
+                    addClient(form).then(res => {
+                      this.$sm(res.data.title)
+                      resolve(res.data)
+                    }).catch(() => {
+                      this.loading = false
+                    })
+                  }
                 }
               }
             }).catch(() => {
@@ -667,6 +710,7 @@ export default {
             })
           }
         }).catch(err => {
+          console.log('catch:', err);
           let mobile = err.find(item => item.name === 'mobile')
           if (mobile && !VerifyFunc.poPhone(mobile)) this.$fm('手机号码格式错误')
           let qqNumber = err.find(item => item.name === 'qqNumber')
@@ -691,9 +735,21 @@ export default {
       this.handleStudentSave().then(res => {
         this.loading = false
         setTimeout(() => {
-          this.$router.push({
-            path: `/counselrecord/${res.id}/null`
-          })
+          console.log('sssss', this.$route.query.onlyReadObj);
+          if (this.$route.query.onlyReadObj) {
+            //  回退到参与人员标识
+            this.$router.push({
+              path: `/counselrecord/${res.id}/null`,
+              query: {
+                isComeFrom: 'actPart'
+              }
+            })
+          } else {
+            this.$router.push({
+              path: `/counselrecord/${res.id}/null`,
+              query: { backNum: -2 }
+            })
+          }
         }, 2000)
       })
     },
@@ -702,9 +758,9 @@ export default {
 
     },
     handleBack() {
-      setTimeout(() => {
-        this.$router.go(-1)
-      }, 2000)
+      // setTimeout(() => {
+      this.$router.go(-1)
+      // }, 2000)
     }
   }
 }

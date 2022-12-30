@@ -11,6 +11,7 @@ export default {
   data() {
     return {
       srcUrl: "http://mhelp.joineast.com",
+      // srcUrl:'http://192.168.50.251:8028/help/index',
       w: 0,
       h: 0,
     };

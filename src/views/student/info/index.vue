@@ -8,7 +8,7 @@
         <div class="student-records">
           <van-tabs v-model="recordsTab" title-inactive-color='#999999' title-active-color='#333333' color='#333333' lazy-render>
             <van-tab title="咨询记录">
-              <CounselRecord ref="CounselRecordRef" :sId="sId" :isAutoScroll.sync="isAutoScroll" />
+              <CounselRecord ref="CounselRecordRef" :sId="sId" :isAutoScroll.sync="isAutoScroll" @listLength="handleSetCounselRecordLength" :editFlag="listType != 7" />
             </van-tab>
             <van-tab title="活动记录">
               <ActiveRecord ref="ActiveRecordRef" :sId="sId" :isAutoScroll.sync="isAutoScroll" />
@@ -25,9 +25,9 @@
         <img src="@/assets/images/icons/btn_record.png" alt="">
         <div>添加咨询记录</div>
       </van-button>
-      <van-button class="student-b-btn" v-permission="'PG:STU:CONSULT'" @click="handleBtn('isConsultSubscribeShow')">
+      <van-button class="student-b-btn" v-permission="'PG:STU:CONSULT'" @click="handleBtn('isConsultSubscribeShow', counselRecordLength ? '修改预约' : '预约咨询')">
         <img src="@/assets/images/icons/yuyue.png" alt="">
-        <div>预约咨询</div>
+        <div>{{counselRecordLength ? '修改预约' : '预约咨询'}}</div>
       </van-button>
       <van-button class="student-b-btn" v-permission="'PG:STU:FILE_EDIT'" @click="handleBtn('studentInfoEdit')">
         <img src="@/assets/images/icons/btn_edit.png" alt="">
@@ -54,23 +54,23 @@
         </div>
         <div class="student-more-btns">
           <van-button class="student-b-btn" v-permission="'PG:STU:BATCH_DISTRIBUTION'" @click="handleBtn('isConsultDistributeShow')">
-            <img src="@/assets/images/icons/btn_record.png" alt="">
+            <img src="@/assets/images/icons/ConsultSubscribe.png" alt="">
             <div>分配咨询</div>
           </van-button>
           <van-button class="student-b-btn" v-permission="'PG:STU:MARKET_AREA'" @click="handleBtn('isConsultMarketAreaShow')">
-            <img src="@/assets/images/icons/yuyue.png" alt="">
+            <img src="@/assets/images/icons/btn_edit.png" alt="">
             <div>修改市场区域</div>
           </van-button>
-          <van-button class="student-b-btn" v-permission="'PG:STU:DELIVER'" @click="handleBtn('isConsultHandOverShow')">
-            <img src="@/assets/images/icons/btn_edit.png" alt="">
-            <div>转交</div>
-          </van-button>
           <van-button class="student-b-btn" v-permission="'PG:STU:HAND_OVER'" @click="handleBtn('isConsultDeliverShow')">
-            <img src="@/assets/images/icons/addOrder.png" alt="">
+            <img src="@/assets/images/icons/hand_on.png" alt="">
             <div>移交</div>
           </van-button>
+          <van-button class="student-b-btn" v-permission="'PG:STU:DELIVER'" @click="handleBtn('isConsultHandOverShow')">
+            <img src="@/assets/images/icons/hand_over.png" alt="">
+            <div>转交</div>
+          </van-button>
           <van-button class="student-b-btn" v-permission="'PG:STU:PUT_PUBLIC'" @click="handleBtn('isConsultSeaShow')">
-            <img src="@/assets/images/icons/btn_moe.png" alt="">
+            <img src="@/assets/images/icons/international_waters.png" alt="">
             <div>放入公海</div>
           </van-button>
         </div>
@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { consultationInfoApi } from '@/api/potentialGuest/consultation'
+import { consultationInfoApi, appointmentConsultationInfoApi } from '@/api/potentialGuest/consultation'
 import { getScrollTop } from '@/utils'
 export default {
   name: 'student-info',
@@ -93,6 +93,7 @@ export default {
   },
   data() {
     return {
+      counselRecordLength: 0,
       isAutoScroll: false,
       height: 0,
       sId: null,
@@ -127,6 +128,9 @@ export default {
     }
   },
   methods: {
+    handleSetCounselRecordLength(length) {
+      this.counselRecordLength = length
+    },
     handleInitSid() {
       let sId = Number(this.$route.params.sid)
       let listType = this.$route.params.listtype
@@ -154,7 +158,8 @@ export default {
     handleDetail() {
       return new Promise(resolve => {
         this.$loading(true, 'studentInfo')
-        consultationInfoApi(this.sId).then(res => {
+        const api = this.listType === 'yuYueZiXun' ? appointmentConsultationInfoApi : consultationInfoApi
+        api(this.sId, Number(this.$route.params.listtype)).then(res => {
           this.studentInfo = res.data || {}
           resolve()
         }).catch(() => {
@@ -186,7 +191,7 @@ export default {
     handleStudentCardMounted() {
       this.isStudentCard = true
     },
-    handleBtn(val) {
+    handleBtn(val, text = null) {
       if (!val) return
       if (val === 'studentInfoEdit') {
         this.isAutoScroll = true
@@ -202,7 +207,7 @@ export default {
         this.isDialog = true
       } else {
         this.isDialog = false
-        this.$refs.StudentCard.handlePopSelect({ dialogName: val })
+        this.$refs.StudentCard.handlePopSelect({ dialogName: val, text: text })
       }
     }
   }

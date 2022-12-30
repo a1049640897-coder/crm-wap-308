@@ -3,7 +3,7 @@
     <HeaderFilter :listType="listType" @onListQuery="handleListQuery" :paramProp="listQuery.param" />
     <RMList :moreLoading.sync="moreLoading" :refreshing.sync="refreshing" :finished.sync="finished" @onLoad="handleLoad" @onRefresh="handleRefresh" isMore :tableList="tableList">
       <div>
-        <StudentCard v-for="(item, index) in tableList" :key="item.id" :sId="listType === 'yuYueZiXun' ? item.studentId : item.id" :studentData="item" @onUpdataInfo="handleUpdataInfo($event, item, index)" :listType="listType" @onAllRefresh="handleAllRefresh" />
+        <StudentCard v-for="(item, index) in tableList" :key="item.id" :sId="listType === 'yuYueZiXun' ? item.studentId : item.id" :studentData="item" @onUpdataInfo="handleUpdataInfo($event, index)" :listType="listType" @onAllRefresh="handleAllRefresh" />
       </div>
     </RMList>
     <div class="common-bottom-btns" v-if="['1', '4'].includes(listType)">
@@ -18,7 +18,7 @@
 <script>
 // 咨询用户
 import { getScrollTop } from '@/utils'
-import { consultationListApi, yuYueZixunListApi } from '@/api/potentialGuest/consultation'
+import { allStudentApi, yuYueZixunListApi } from '@/api/potentialGuest/consultation'
 import { mapState } from 'vuex'
 
 export default {
@@ -67,7 +67,7 @@ export default {
           sourceId: null, // 来源渠道(更多)
           intentionIds: [], // 意向类型
           intentionCourseIds: [], // 意向班型(更多)
-          dateType: this.listType === '1' ? 3 : 2, // 日期类型
+          dateType: this.listType === '4' ? 1 : this.listType === '1' ? 3 : 2, // 日期类型
           startDate: null, // 开始时间
           endDate: null, // 结束时间
           dateRange: '',// 日期区间
@@ -92,16 +92,16 @@ export default {
           consultantId: [], // 咨询结果
           consultantIdLocal: null, // 咨询/市场 -- 本地(更多)
           showConsultRecord: 1, // 是否加载咨询记录
-          handover: ['8'].includes(this.listType) ? 0 : 1, // 是否不看移交
-          noneHigh: ['3', '8'].includes(this.listType) ? 0 : 1, // 是否不看已报高端
-          visit: ['4', '8'].includes(this.listType) ? 0 : 1, // 是否无需回访
+          handover: ['7', '8'].includes(this.listType) ? 0 : 1, // 是否不看移交
+          noneHigh: ['3','7', '8'].includes(this.listType) ? 0 : 1, // 是否不看已报高端
+          visit: ['4','7', '8'].includes(this.listType) ? 0 : 1, // 是否无需回访
           graduationYear: [], // 毕业年份
           graduationYearLocal: null, // 毕业年份 -- 本地(更多)
           consultState: null, // 状态
           sortRule: this.listType === '1' ? { title: '最后回访', type: 1, column: "lastConsultTime" }
           : this.listType === '4' ? { title: '添加日期', type: 1, column: 'addTime' }
           : this.listType === '5' ? { title: '添加日期', type: 1, column: 'addTime' }
-          : this.listType === '7' ? { title: '添加日期', type: 1, column: 'addTime' } 
+          : this.listType === '7' ? { title: '投放日期', type: 1, column: 'seaPutTime' } 
           : this.listType === '8' ? { title: '添加日期', type: 1, column: 'addTime' } 
           : this.listType === 'yuYueZiXun' ? { title: '添加日期', type: 1, column: 'addTime' }: {},
 
@@ -147,7 +147,6 @@ export default {
       window.addEventListener('scroll', this.handleScroll)
       window.scrollTo(0, this.height)
     },
-
     handleInit() {
       this.getTableList('init')
     },
@@ -155,7 +154,7 @@ export default {
     getTableList(val, propPage) {
       this.moreLoading = true
       this.$loading(true, `cTableLoading_${this.listType}`)
-      const { shellIdsLocal, schoolIdLocal, consultTypeLocal, examYearLocal, isFreshLocal, campusLocal, ownLocal, graduationYearLocal, sortRule, resultIdLocal, consultantIdLocal, seaPutUserIdsLocal, creatorIdsLocal } = this.listQuery.param
+      const { shellIdsLocal, schoolIdLocal, consultTypeLocal, examYearLocal, isFreshLocal, campusLocal, ownLocal, graduationYearLocal, sortRule, resultIdLocal, consultantIdLocal, seaPutUserIdsLocal, creatorIdsLocal, distributeStartDate, distributeEndDate } = this.listQuery.param
       const query = {
         pageinfo: {
           ...this.listQuery.pageinfo,
@@ -166,7 +165,10 @@ export default {
           ...this.listQuery.param,
           type: this.listType === 'yuYueZiXun' ? this.listQuery.param.yuYuetZiXunType : this.listType,
           showConsultRecord: 1,
-          shellIds: shellIdsLocal ? [shellIdsLocal] : [], // 部门
+          branchId: this.listType === 'yuYueZiXun' ? shellIdsLocal : null,
+          beginAppointmentTime: this.listType === 'yuYueZiXun' ? distributeStartDate : null,
+          endAppointmentTime: this.listType === 'yuYueZiXun' ? distributeEndDate : null,
+          shellIds: this.listType === 'yuYueZiXun' ? [] : shellIdsLocal ? [shellIdsLocal] : [], // 部门
           schoolId: schoolIdLocal ? [schoolIdLocal] : [], // 就读学校 
           consultType: consultTypeLocal ? consultTypeLocal === -1 ? [] : [consultTypeLocal] : [], // 咨询类型
           examYear: examYearLocal ? [examYearLocal] : [], // 考试年份
@@ -186,7 +188,7 @@ export default {
           ...propPage
         }
       }
-      let api = this.listType === 'yuYueZiXun' ? yuYueZixunListApi : consultationListApi
+      let api = this.listType === 'yuYueZiXun' ? yuYueZixunListApi : allStudentApi
       api(query).then(res => {
         if (['init', 'refresh'].includes(val)) {
           this.tableList = res.data || []
@@ -249,8 +251,10 @@ export default {
       // })
       this.$router.push('/studentinfo')
     },
-    handleUpdataInfo(obj, item, index) {
-      this.tableList.splice(index, 1, obj)
+    handleUpdataInfo(obj, index) {
+      if (obj) {
+        this.tableList.splice(index, 1, obj)
+      } else this.tableList.splice(index, 1)
     },
     handleAddStudent() {
       this.isRefreshTable = true

@@ -219,9 +219,7 @@ export default class MyworkOrder extends React.Component {
     const { param } = listQuery;
     param.startDate = dayjs(startDate).format("YYYY/MM/DD");
     param.endDate = dayjs(endDate).format("YYYY/MM/DD");
-    this.setState({ dateVisible: false, listQuery, modal2: true }, () => {
-      console.log(param);
-    });
+    this.setState({ dateVisible: false, listQuery, modal2: true });
   }
   handleCancelonCancel = () => {
     const { listQuery } = this.state;

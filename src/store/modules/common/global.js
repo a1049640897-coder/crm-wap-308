@@ -1,6 +1,6 @@
 
 import Vue from "vue"
-import { authorityTreeApi, commonCascadeApi, getPaymentTypeApi } from '@/api/common'
+import { authorityTreeApi } from '@/api/common'
 export default {
   namespaced: true,
   state: {
@@ -25,32 +25,13 @@ export default {
       }
     ],
     activityId: null, // 刷新列表的活动id
-    tuitionStatusList: [], // 学费缴纳状态列表
-    payModeList: [], // 支付方式列表
   },
   actions: {
     setAuthorityTree({ commit }) {
       authorityTreeApi().then(res => {
         commit('SET_ISHASDEPARTMENT2', res.data)
       })
-    },
-    setTourtionList({ commit }) {
-      commonCascadeApi('xfjnzt').then(res => {
-        let newArr = (res.data || []).map(element => {
-          return {
-            id: element.id,
-            title: element.text
-          }
-        });
-        commit('SET_TUITIONSTATUSList', newArr)
-      })
-    },
-    setPayModeList({ commit }) {
-      getPaymentTypeApi().then(res => {
-        commit('SET_PAYMODE_List', res.data)
-      })
-    },
-
+    }
   },
   mutations: {
     // 设置活动默认的tab
@@ -67,13 +48,7 @@ export default {
     SET_ACTIVITYID(state, payload) {
       const { activityId } = payload
       state.activityId = activityId
-    },
-    SET_TUITIONSTATUSList(state, list) {
-      state.tuitionStatusList = list
-    },
-    SET_PAYMODE_List(state, list) {
-      state.payModeList = list
-    },
+    }
   },
 
 }

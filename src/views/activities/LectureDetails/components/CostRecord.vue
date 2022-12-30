@@ -2,7 +2,7 @@
   <div>
     <RMList v-if="tableList.length" :moreLoading.sync="moreLoading" :refreshing.sync="refreshing" :finished.sync="finished" @onLoad="handleLoad" @onRefresh="handleRefresh" isMore :tableList="tableList">
       <div>
-        <StudentCard v-for="(item) in  tableList" :key="item.id" :sId="sId" :counselTab="counselTab" :costData="item" @onUpdataInfo="handleUpdataInfo" />
+        <StudentCard v-for="(item) in  tableList" :branchId="branchId" :key="item.id" :sId="sId" :counselTab="counselTab" :costData="item" @onUpdataInfo="handleUpdataInfo" />
       </div>
     </RMList>
     <div class="common-empty" v-else style="background: #ffffff;">

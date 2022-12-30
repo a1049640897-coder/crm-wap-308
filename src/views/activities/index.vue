@@ -75,7 +75,15 @@ export default {
 
     // 重置详情进入标识判断 详情删除跳转
     this['SET_DETAILFLAG']({ flag: false })
+
+    // 重置讲座、活动详情缓存
     this.$EventBus.$emit('handleResetLive', 'activities-lectureDetails')
+
+    //  删除关联问卷的标识
+    sessionStorage.removeItem('counselTab')
+
+    // 重置问卷预览缓存
+    this.$EventBus.$emit('handleResetLive', 'activities-QuesConnect')
   },
   methods: {
     ...mapActions('activity', ['queryListAct']),
@@ -89,7 +97,6 @@ export default {
     },
     handleTabInit() {
       let tab = this.$route.params.tab
-      console.log('this.$route.',this.$route);
       this.counselTab = tab
     },
     // tab切换改变设置默认的tab

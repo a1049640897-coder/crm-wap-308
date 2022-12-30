@@ -5,21 +5,21 @@
         <div class="common-popup-header">
           <div></div>
           <div class="common-popup-header-title">
-            <span>预约咨询</span>
+            <span>{{counseltitle}}</span>
           </div>
           <div></div>
         </div>
-        <div class="common-popup-body" >
+        <div class="common-popup-body">
           <van-form ref="ConsultSubscribeForm" @submit="handleConfirm" :show-error-message="false" validate-trigger="onSubmit">
-            <van-field label="预约周期" :value="showDate" @click="handleDateShow" name="reserveTime" readonly clearable required input-align="right" :rules="[
+            <van-field label="预约周期" v-model="showDate" @click="handleDateShow" name="reserveTime" readonly clearable required input-align="right" :rules="[
               { required: true, message: '请选择预约周期' }
-            ]" right-icon="arrow" placeholder="请选择" />
+            ]" :right-icon="showDate ? 'clear' : 'arrow'" placeholder="请选择" @click-right-icon.stop="handleDateRightIcon" />
             <RePick ref="consultantRef" v-model="listQuery.consultantId" label="咨询/市场" :list="consultantList" name="consultantId" multiple isShowSearch isRequrie isCell />
             <van-field label="备注" v-model="listQuery.remark" name="reserveTime" clearable rows="3" autosize type="textarea" maxlength="500" input-align="right" placeholder="请输入" />
             <div class="common-popup-footer" style="padding: 0 1rem; box-sizing: boder-box;">
               <van-button style="width: 100%; margin-right: 1rem;" native-type="button" @click="handleClose">取消</van-button>
-              <van-button type="danger" v-if="!reserveConsultId" style="width: 100%; margin-right: 1rem;" :disabled="!!counselState" @click="handleDel">删除</van-button>
-              <van-button type="info" style="width: 100%;" native-type="submit">预约</van-button>
+              <van-button type="danger" v-if="counseltitle === '修改预约'" style="width: 100%; margin-right: 1rem;" :disabled="!!counselState" plain @click="handleDel">删除</van-button>
+              <van-button type="info" style="width: 100%;" native-type="submit">{{counseltitle === '修改预约' ? '保存' : '预约'}}</van-button>
             </div>
           </van-form>
         </div>
@@ -51,7 +51,11 @@ export default {
     aId: Number,
     // 编辑Id
     reserveConsultId: Number,
-    counselState: [String, Number]
+    counselState: [String, Number],
+    counseltitle: {
+      type: String,
+      default: '预约咨询'
+    }
   },
   components: {
     RePick: () => import('../ReComponents/RePick')
@@ -60,12 +64,13 @@ export default {
     return {
       isDialog: false,
       dateShow: false,
-      defaultDate: null,
+      defaultDate: [dayjs().toDate(), null],
       consultantList: [],
-      listQuery: {}
+      listQuery: {},
+      showDate: null
     }
   },
-  computed: {
+  /* computed: {
     showDate() {
       if (this.listQuery.startReserveTime) {
         return this.listQuery.startReserveTime + '-' + this.listQuery.endReserveTime
@@ -73,11 +78,11 @@ export default {
         return null
       }
     }
-  },
+  }, */
   watch: {
     isOpen(val) {
       if (val) {
-          this.handleDataInit()
+        this.handleDataInit()
         if (this.reserveConsultId) {
           this.handleConsultant()
           this.handleDetail()
@@ -108,7 +113,7 @@ export default {
         student: this.sId
       }
       this.consultantList = []
-      this.defaultDate = null
+      this.defaultDate = [dayjs().toDate(), null]
       this.$refs.ConsultSubscribeForm && this.$refs.ConsultSubscribeForm.resetValidation()
     },
     handleInit() {
@@ -134,16 +139,30 @@ export default {
         })
       })
     },
+    handleDateRightIcon() {
+      if (this.showDate) {
+        this.defaultDate = [dayjs().toDate(), null]
+        this.listQuery.startReserveTime = null
+        this.listQuery.endReserveTime = null
+        this.showDate = null
+      }
+    },
     handleDetail() {
       this.$loading(true, 'ConsultSubscribe')
       getSimpleCounselInfoApi(this.reserveConsultId).then(res => {
         const { id, startReserveTime, endReserveTime, consultantId, remark } = res.data
         this.listQuery.id = id
         this.listQuery.consultantId = consultantId || []
-        this.listQuery.startReserveTime = dayjs(startReserveTime).format('YYYY/MM/DD')
-        this.listQuery.endReserveTime = dayjs(endReserveTime).format('YYYY/MM/DD')
+        if (startReserveTime) {
+          this.listQuery.startReserveTime = dayjs(startReserveTime).format('YYYY/MM/DD')
+          this.listQuery.endReserveTime = dayjs(endReserveTime).format('YYYY/MM/DD')
+          this.defaultDate = [dayjs(startReserveTime).toDate(), dayjs(endReserveTime).toDate()]
+        } else {
+          this.listQuery.startReserveTime = null
+          this.listQuery.endReserveTime = null
+          this.defaultDate = [dayjs().toDate(), null]
+        }
         this.listQuery.remark = remark
-        this.defaultDate = [dayjs(startReserveTime).toDate(), dayjs(endReserveTime).toDate()]
       }).finally(() => {
         this.$loading(false, 'ConsultSubscribe')
       })
@@ -153,13 +172,14 @@ export default {
     },
     handleConsultant() {
       consultantListApi([this.sId]).then(res => {
-        this.consultantList = res.data
+        this.consultantList = res.data || []
       })
     },
     handleDateSelect(e) {
       this.defaultDate = e
       this.listQuery.startReserveTime = dayjs(e[0]).format('YYYY/MM/DD')
       this.listQuery.endReserveTime = dayjs(e[1]).format('YYYY/MM/DD')
+      this.showDate = this.listQuery.startReserveTime + '-' + this.listQuery.endReserveTime
       this.dateShow = false
     },
     handleClose() {

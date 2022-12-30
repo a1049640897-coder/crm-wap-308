@@ -66,14 +66,6 @@ export function addClient(data) {
     data
   })
 }
-// 修改潜在客户
-export function editClientApi(data) {
-  return request({
-    url: `/market/potentialStudentReal`,
-    method: 'patch',
-    data
-  })
-}
 
 // 根据毕业年份得出在校生属性
 export function getStudentAttrApi(year) {

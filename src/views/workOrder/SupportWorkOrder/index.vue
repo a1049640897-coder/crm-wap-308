@@ -240,9 +240,7 @@ export default ({
       }).finally(() => {
         this.loading = false
         this.init()
-        this.$router.push({
-          path: '/home'
-        })
+        this.$router.go(-1)
       })
     },
     init() {
@@ -274,7 +272,6 @@ export default ({
           return
         }
         this.tableData.fileList = [file]
-        // this.tableData.fileList.push(file)
       } else {
         files.splice(files.length - 1, 1)
       }

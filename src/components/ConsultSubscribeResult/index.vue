@@ -44,7 +44,7 @@ export default {
     },
     // 活动id
     aId: Number,
-    reserveConsultResult: String
+    reserveConsultResult: [String, Number]
   },
   components: {
     RePick: () => import('../ReComponents/RePick')
@@ -76,17 +76,17 @@ export default {
       this.zxjgList = []
       this.listQuery = {
         id: this.sId,
-        resultId: null,
+        resultId: this.reserveConsultResult,
         activityId: this.aId,
         studentId: this.sId
       }
       this.$refs.ConsultSubscribeResultForm && this.$refs.ConsultSubscribeResultForm.resetValidation()
     },
     handleInit() {
-        this.handleDataInit()
-        commonCascadeApi('zxjg').then(res => {
-          this.zxjgList = res.data || []
-        })
+      this.handleDataInit()
+      commonCascadeApi('zxjg').then(res => {
+        this.zxjgList = res.data || []
+      })
     },
     handleClose() {
       this.handleDataInit()

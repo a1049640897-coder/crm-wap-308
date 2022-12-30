@@ -4,10 +4,10 @@
     <div class="tabs-lf">
       <van-tabs v-model="counselTab" title-inactive-color='#999999' title-active-color='#333333' color='#333333' v-if="btnList.filter(v=>v.isShow).length" lazy-render>
         <van-tab v-for="(item,index) in  filterBtnList" :title="item.title" :name="item.name" :key="index" :badge="item.count">
-          <WaitCounsel v-if="item.id == 2" />
-          <WaitReceive v-if="item.id == 3" @onListRefresh="handleInitHeaderTotal" />
-          <WaitFollow v-if="item.id == 1" />
-          <WaitNowActivity v-if="item.id == 4" ref="waitNowActivity" />
+          <WaitCounsel v-if="item.id == 2" :listType="item.listType" />
+          <WaitReceive v-if="item.id == 3" @onListRefresh="handleInitHeaderTotal" :listType="item.listType" />
+          <WaitFollow v-if="item.id == 1" :listType="item.listType" />
+          <WaitNowActivity v-if="item.id == 4" ref="waitNowActivity" :listType="item.listType" />
         </van-tab>
       </van-tabs>
     </div>
@@ -48,10 +48,10 @@ export default {
         tab_4_count: 0
       },
       btnList: [
-        { id: 1, num: 0, title: '待跟进', isShow: true, tab: menuPermissionUtil('PG:WTW'), name: 'WaitFollow', count: 0 },
-        { id: 2, num: 0, title: '预约咨询', isShow: true, tab: menuPermissionUtil('PG:RC'), name: 'WaitCounsel', count: 0 },
-        { id: 3, num: 0, title: '待接收', isShow: true, tab: menuPermissionUtil('HO:WAITRECEPTION'), name: 'WaitReceive', count: 0 },
-        { id: 4, num: 0, title: '今日活动', isShow: true, tab: true, name: 'WaitNowActivity', count: 0 },
+        { id: 1, num: 0, title: '待跟进', isShow: true, tab: menuPermissionUtil('PG:WTW'), name: 'WaitFollow', count: 0, listType: 2 },
+        { id: 2, num: 0, title: '预约咨询', isShow: true, tab: menuPermissionUtil('PG:RC'), name: 'WaitCounsel', count: 0, listType: 2 },
+        { id: 3, num: 0, title: '待接收', isShow: true, tab: menuPermissionUtil('HO:WAITRECEPTION'), name: 'WaitReceive', count: 0, listType: 2 },
+        { id: 4, num: 0, title: '今日活动', isShow: true, tab: true, name: 'WaitNowActivity', count: 0, listType: 2 },
       ],
       isQuickMenuDialog: false,
 
@@ -92,8 +92,10 @@ export default {
         this['SET_ACTIVITYADDSTATE']()
       })
     }
-
     this.$EventBus.$emit('handleResetLive', 'activities-lectureDetails')
+
+    // 重置问卷预览缓存
+    this.$EventBus.$emit('handleResetLive', 'activities-QuesConnect')
   },
   methods: {
     ...mapMutations('activity/', ['SET_ACTIVITYSTATE', 'SET_ACTIVITYADDSTATE']),
@@ -115,7 +117,7 @@ export default {
     ...mapActions('common/db', ['get']),
     ...mapActions('consultation', ['queryListAct']),
     handleInit() {
-      this.queryListAct()
+      this.queryListAct(2)
       this.get({
         argu: 'quickBtn',
         user: true
@@ -131,16 +133,16 @@ export default {
         // this.btnList.
         this.btnList.forEach(v => {
           if (v.name == 'WaitFollow') {
-            this.$set(v, 'count', followedCount || 0)
+            this.$set(v, 'count', followedCount ? followedCount > 99 ? '...' : followedCount : 0)
           }
           if (v.name == 'WaitCounsel') {
-            this.$set(v, 'count', reserveConsultCount || 0)
+            this.$set(v, 'count', reserveConsultCount ? reserveConsultCount > 99 ? '...' : reserveConsultCount : 0)
           }
           if (v.name == 'WaitReceive') {
-            this.$set(v, 'count', toBeReceived || 0)
+            this.$set(v, 'count', toBeReceived ? toBeReceived > 99 ? '...' : toBeReceived : 0)
           }
           if (v.name == 'WaitNowActivity') {
-            this.$set(v, 'count', todayActivityCount || 0)
+            this.$set(v, 'count', todayActivityCount ? todayActivityCount > 99 ? '...' : todayActivityCount : 0)
           }
         });
       })

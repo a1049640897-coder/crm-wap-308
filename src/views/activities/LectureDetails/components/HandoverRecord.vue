@@ -1,6 +1,6 @@
 <template>
   <div>
-    <HandoverFilter :listType="listType" :paramProp="listConditonObj" :filterProp="listFilterObj" @onListQuery="handleListQuery" v-if="firstList.length" />
+    <HandoverFilter :listType="listType" :moreActLecture="moreActLecture" :paramProp="listQuery.handoverParameterVO" :filterProp="listFilterObj" @onListQuery="handleListQuery" v-if="firstList.length" />
     <div class="count-cont" v-if="firstList.length">
       <div class="count-list">
         <van-loading v-if="cloading" size="0.6rem" style="margin-bottom:0.4rem" />
@@ -28,6 +28,7 @@
 </template>
 <script>
 import { activityhandoverListApi, activityheaderStatisticalApi } from '@/api/potentialGuest/activity'
+import { mapState } from 'vuex'
 // 移交情况
 export default {
   props: {},
@@ -35,6 +36,11 @@ export default {
     HandoverFilter: () => import('./HandoverFilter'),
     RMList: () => import('@/components/ReComponents/RMList'),
     StudentCard: () => import('@/components/HandoverCard')
+  },
+  computed: {
+    ...mapState({
+      pageSize: state => state.common.setting.pageSize,
+    })
   },
   data() {
     return {
@@ -52,7 +58,7 @@ export default {
           activityId: 236,
           beginDate: null,
           endDate: null,
-          day: 30,
+          day: 6,
           handoverKeyword: null,
           handoverShellId: [],
           handoverState: null,
@@ -70,7 +76,8 @@ export default {
         },
         pageinfo: { pageNum: 1, pageSize: 20, sort: [{ type: 1, column: 'addTime' }] }
       },
-      firstList: []
+      firstList: [],
+      moreActLecture: {}
     }
   },
   created() {
@@ -112,7 +119,7 @@ export default {
       const query = {
         pageinfo: {
           ...this.listQuery.pageinfo,
-          // pageSize: this.pageSize/* ,
+          pageSize: this.pageSize/* ,
           // sort: [this.listQuery.pageinfo.sort] */
         },
         handoverParameterVO: {
@@ -121,6 +128,7 @@ export default {
           activityId: this.sId
         }
       }
+      this.moreActLecture = query.handoverParameterVO
 
       let data = []
 

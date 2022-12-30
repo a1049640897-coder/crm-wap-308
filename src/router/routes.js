@@ -4,8 +4,6 @@ import workOrder from './modules/workOrder'
 import student from './modules/student'
 import waitTodo from './modules/waitTodo'
 import handover from './modules/handover'
-import order from './modules/order'
-import course from './modules/course'
 
 export const frameInRoutes = [
   {
@@ -14,13 +12,12 @@ export const frameInRoutes = [
     redirect: '/home',
     component: layoutHome,
     children: (pre => [
-      { path: '/consultation', name: `${pre}consultation`, component: () => import('@/views/consultation/index'), meta: { isTab: true, cache: true, title: '咨询' } },
-      { path: '/handover', name: `${pre}handover`, component: () => import('@/views/handover/index'), meta: { isTab: true, cache: true, title: '移交' } },
+      { path: '/consultation', name: `${pre}consultation`, component: () => import('@/views/consultation/index'), meta: { isTab: true, cache: true, title: '咨询'} },
+      { path: '/handover', name: `${pre}handover`, component: () => import('@/views/handover/index'), meta: { isTab: true, cache: true, title: '移交'} },
       // { path: '/activities', name: `${pre}activities`, component: () => import('@/views/activities/index'), meta: { isTab: true, cache: true, title: '移交', icon: 'shop' } },
-      { path: '/home', name: `${pre}index`, component: () => import('@/views/home/index'), meta: { isTab: true, cache: true, default: true, title: '聚创工作台' } },
-      { path: '/orderManage', name: `${pre}orderManage`, component: () => import('@/views/orderManage/index'), meta: { isTab: true, cache: true, title: '订单', isCloseBackHome: true } },
-      // { path: '/courseManage', name: `${pre}courseManage`, component: () => import('@/views/courseManage/index'), meta: { isTab: true, cache: true, title: '课程包收款' } },
-      { path: '/stat', name: `${pre}stat`, component: () => import('@/views/stat/index'), meta: { isTab: true, cache: true, title: '统计' } }
+      { path: '/home', name: `${pre}index`, component: () => import('@/views/home/index'), meta: { isTab: true, cache: true, default: true, title: '聚创工作台'} },
+      { path: '/orderManage', name: `${pre}orderManage`, component: () => import('@/views/orderManage/index'), meta: { isTab: true, cache: true, title: '订单'} },
+      { path: '/stat', name: `${pre}stat`, component: () => import('@/views/stat/index'), meta: { isTab: true, cache: true, title: '统计'} }
     ])('home-')
   },
   {
@@ -32,7 +29,7 @@ export const frameInRoutes = [
         path: '/searchStudent',
         name: `${pre}student`,
         component: () => import('@/views/searchStudent/index'),
-        meta: { cache: true, title: '全局搜索' }
+        meta: { cache: true, title: '全局搜索'}
       }
     ])('allSearch-')
   },
@@ -40,9 +37,7 @@ export const frameInRoutes = [
   workOrder,
   student,
   waitTodo,
-  handover,
-  order,
-  course
+  handover
 ]
 
 export const frameOutRoutes = [

@@ -18,13 +18,13 @@
         <div class="work_studentInfo mb">图片</div>
         <div class="workimg_cont">
           <div class="workimng">
-            <img v-for="(item,index) in workData.imgList" :key="index" :src="item" class="workimngimg" alt="" @click="handleImageView(index, workData.imgList)">
+            <img v-for="(item,index) in workData.imgList" :key="index" :src="item" class="workimngimg" alt="">
           </div>
         </div>
       </div>
       <div class="work_studentInfo mb2" v-show="workData.fileName">
         <span>文件：</span>
-        <span @click="openfile">{{workData.fileName}}</span>
+        <span @click="this.openfile">{{workData.fileName}}</span>
       </div>
     </div>
     <div class="buttom">
@@ -47,8 +47,6 @@
 import {
   workOrderTypedetailApi
 } from "@/api/workOrder";
-import { ImagePreview } from 'vant'
-
 export default {
   name: 'WorkDetail',
   data() {
@@ -74,19 +72,13 @@ export default {
       workOrderTypedetailApi(this.workId).then(res => {
         if (res.data.solution) {
           let reg = /<img/g
-          res.data.solution = res.data.solution.replace(reg, '<img style="width:100%;height:100%"')
+          res.data.solution=res.data.solution.replace(reg,'<img style="width:100%;height:100%"')
         }
         this.workData = res.data
       })
     },
     openfile() {
       window.open(this.workData.attachPath)
-    },
-    handleImageView(index, list) {
-      ImagePreview({
-        images: list,
-        startPosition: index
-      })
     }
   }
 
@@ -116,7 +108,7 @@ export default {
       font-size: 0.86rem;
       color: #ffffff;
       margin-top: 0.6rem;
-      word-break: break-all;
+      word-break: break-all
     }
 
     .work_studentInfo {

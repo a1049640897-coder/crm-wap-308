@@ -6,7 +6,7 @@
       <RePick v-model="submitForm.collegeInfoId" label="院校名称" ref="yxmc" v-if="collegeInfoIdIsShow" :list.sync="schoolList" @change="handleSchool" isShowSearch isOriginSchool :originSchoolAttr="submitForm.attributeId" name="collegeInfoId" originSchoolType="1" :isRequrie="false" isCell clearable />
       <!-- <RePick v-model="submitForm.collegeInfoId" label="院校名称" ref="yxmc" isOriginActivitySchoolSearch @change="handleSchool" :list.sync="schoolList" originSchoolType="1" isShowSearch name="collegeInfoId" isCell clearable /> -->
 
-      <RePick v-model="submitForm.opponentId" label="对手名称" name="opponentId" v-if="[2].includes(activityType)" isShowSearch :list="opponentOptions" isRequrie isCell clearable />
+      <RePick v-model="submitForm.opponentId" label="对手名称" name="opponentId" v-if="[2].includes(activityType)" :list="opponentOptions" isRequrie isCell clearable />
       <van-field v-model="submitForm.title" :label="[1,2].includes(activityType) ? '讲座名称' :'活动名称'" required clear-trigger="always" name="title" clearable input-align="right" maxlength="50" placeholder="请输入" :rules="[{ required: true, message: '请输入' }]" />
       <RePick v-model="submitForm.sendBookType" :label="[1].includes(activityType) ? '讲座类型' :'活动类型'" v-if="[3].includes(activityType)" isRequrie :list.sync="activityTypeList" name="sendBookType" isCell clearable />
       <RePick v-model="submitForm.lectureType" :label="[1,2].includes(activityType) ? '讲座类型' :'活动类型'" v-if="[1,2].includes(activityType)" name="lectureType" :list="lectureTypeListL" isRequrie isCell clearable />
@@ -21,7 +21,6 @@
           </van-radio-group>
         </template>
       </van-field>
-      <van-field v-model="submitForm.rivalTeacher" :label="'讲师姓名'" v-if="[2].includes(activityType)" required clear-trigger="always" maxlength="50" clearable input-align="right" placeholder="请输入" :rules="[{ required: true, message: '请输入' }]" />
       <RePick v-model="submitForm.materialId" label="资料清单" name="materialId" v-if="[3].includes(activityType)" :list="dataList" isShowSearch isCell multiple clearable />
       <RePick v-model="submitForm.courseIds" label="课程清单" name="courseIds" v-if="[3].includes(activityType)" :list="courseList" isShowSearch isCell multiple clearable />
       <van-field :label=" this.activityType == 1 ? '讲师类型' :'授课类型'" name="teacherType" required input-align="right" label-width="9em" v-if="[1].includes(activityType)">
@@ -32,7 +31,7 @@
           </van-radio-group>
         </template>
       </van-field>
-      <RePick v-model="submitForm.lecturer" label="讲师姓名" isRequrie :list.sync="teacherInsideNameList" isShowSearch multiple name="lecturer" isCell clearable v-if="[1].includes(activityType) && submitForm.teacherType == 1" isUseLimitPage />
+      <RePick v-model="submitForm.lecturer" label="讲师姓名" isRequrie :list.sync="teacherInsideNameList" isShowSearch multiple name="lecturer" isCell clearable v-if="[1].includes(activityType) && submitForm.teacherType == 1" />
       <RePick v-model="submitForm.lecturer" label="讲师姓名" isRequrie :list.sync="teacherOutNameList" isShowSearch multiple name="lecturer" isCell clearable v-if="[1].includes(activityType) && submitForm.teacherType == 2" />
       <div class="add-lecturer" v-if="[1].includes(activityType) && submitForm.teacherType == 2">没有匹配到讲师? <span @click.stop="handleAddLecture">去添加讲师</span> </div>
       <van-field v-model="submitForm.studyUrl" label="上课链接" clear-trigger="always" clearable input-align="right" maxlength="100" placeholder="http://" v-if="[1,3].includes(activityType)" />
@@ -47,7 +46,7 @@
       <van-field v-model.trim="submitForm.bePresentNumber" label="到场人数" name="bePresentNumber" clear-trigger="always" :rules="[{ validator: asyncValidatorPeopleNum, message: '请输入' }]" v-if="[1,2].includes(activityType)" type="number" clearable input-align="right" placeholder="请输入" />
       <van-field clearable label="上传海报" v-if="[1,3].includes(activityType)">
         <template #input>
-          <van-uploader v-model="bg" :max-count="1" :before-read="handleFileBeforeRead" :before-delete="handleBeforeDel" :max-size="1024 * 1024" @oversize="onOversize" />
+          <van-uploader v-model="bg" :max-count="1" :before-read="handleFileBeforeRead" :max-size="1024 * 1024" @oversize="onOversize" />
         </template>
       </van-field>
       <van-field v-model="submitForm.remark" type="textarea" label="备注" maxlength="50" clear-trigger="always" max clearable input-align="right" placeholder="请输入" />
@@ -76,7 +75,6 @@
 
     <!--  添加外部讲师  -->
     <van-popup v-model="lecturerIsShow" position="bottom" round>
-      <div class="lectureForm-title">添加讲师</div>
       <van-form ref="lectureForm" :show-error-message="false" validate-trigger="" :submit-on-enter="false">
         <van-field v-model="lectureForm.name" label="姓名" required name="name" maxlength="50" clear-trigger="always" clearable input-align="right" placeholder="请输入" :rules="[{ required: true, message: '请输入' }]" />
         <van-field label="性别" name="sex" required input-align="right" label-width="9em">
@@ -578,10 +576,6 @@ export default {
 
     handleShowDate() {
       this.dateIsShow = true
-      // this.defaultDate = new Date('2022/01/08')
-      // this.$nextTick(() => {
-      //   this.$refs.calendar.reset(new Date('2022/11/10'))
-      // })
     },
 
     handleShowTime() {
@@ -738,7 +732,7 @@ export default {
         }
 
         // 判断到场人数是否是正整数
-       
+
         //  添加
         if (this.activityId == 'null') {
           if ([1, 3].includes(this.activityType)) {
@@ -770,15 +764,11 @@ export default {
               }).catch(() => {
                 this.$loading(false, 'activityLoading')
               })
-            }).catch(() => {
-              this.$loading(false, 'activityLoading')
             })
           } else {
             addApi(competeLectData).then(() => {
               Notify({ type: 'success', message: '添加成功!' });
               this.handleBack(-1, 0)
-            }).catch(() => {
-              this.$loading(false, 'activityLoading')
             })
           }
         } else {
@@ -791,21 +781,9 @@ export default {
               formData.append('file', this.bg[0].file)
             }
             formData.append('lecture', new Blob([JSON.stringify(submitBackEndData)], { type: 'application/json' }))
-            EditApi(formData).then((res) => {
-              transform(res.data).then(response => {
-                let isSuccess = response.status === 200
-                Notify({ type: isSuccess ? 'success' : 'warning', message: isSuccess ? '修改成功' : response.msg });
-                if (isSuccess) {
-                  this.$loading(false, 'activityLoading')
-                  this.handleBack(-1, 1)
-                } else {
-                  this.$loading(false, 'activityLoading')
-                }
-              }).catch(() => {
-                this.$loading(false, 'activityLoading')
-              })
-            }).catch(() => {
-              this.$loading(false, 'activityLoading')
+            EditApi(formData).then(() => {
+              Notify({ type: 'success', message: '修改成功!' });
+              this.handleBack(-1, 1)
             })
           } else {
             //编辑
@@ -814,8 +792,6 @@ export default {
             editActivityCptLectApi(competeLectData).then(() => {
               Notify({ type: 'success', message: '修改成功!' });
               this.handleBack(-1, 1)
-            }).catch(() => {
-              this.$loading(false, 'activityLoading')
             })
           }
         }
@@ -834,9 +810,14 @@ export default {
       })
     },
 
-    handleBeforeDel() {
-      this.submitForm.posterImg = null
-      return true
+    // handleConfirmQues() {
+    //   this.$refs.activityForm.validate().then(() => {
+    //     this.handleBack()
+    //   })
+    // },
+
+    handleAfterReadBg() {
+
     }
   }
 }

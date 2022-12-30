@@ -135,7 +135,7 @@
 
         </van-dropdown-menu>
       </div>
-      <!-- 今日活动部门 -->
+      <!-- 8 类型 -->
       <div :class="listQuery.nowActivityshellId ?'now-activity-shellId active':'now-activity-shellId'" @click="handleShow" v-if="nowAuthDepartList.length">{{nowActivityshellIdName}}
         <van-icon name="arrow-down" class="arrow-down" v-if="!listQuery.nowActivityshellId" />
         <van-icon name="cross" class="arrow-down" v-else @click.stop="handleClearShow" />
@@ -180,8 +180,7 @@ import { dayTextFormatter } from '@/utils'
 export default {
   props: {
     listType: String,
-    paramProp: Object,
-    moreActLecture: Object
+    paramProp: Object
   },
   components: {
     ReQuickDateBtns: () => import('@/components/ReComponents/ReQuickDateBtns'),
@@ -204,6 +203,12 @@ export default {
       dayTextFormatter: dayTextFormatter
     }
   },
+  // watch: {
+  //   'listQuery.dateRange': {
+  //     handler(val) {
+  //     }
+  //   }
+  // },
   computed: {
     ...mapState({
       queryList: state => state.activity.queryList,
@@ -240,14 +245,9 @@ export default {
     }),
     isMoreAct() {
       let bol = false
-      const listQuery = this.moreActLecture || {}
-      // const { shellIdsLocal, collegeInfoIdLocal, teacherIds, chargePersonIds, usePersonId, opponent } = listQuery
-      // if (shellIdsLocal || collegeInfoIdLocal || teacherIds || chargePersonIds || usePersonId || opponent) {
-      //   bol = true
-      // }
-      const { chargePersonIds, collegeInfoId, shellIds, teacherIds, usePersonId, opponent } = listQuery
-      if (shellIds && shellIds.length || collegeInfoId && collegeInfoId.length || teacherIds && teacherIds.length ||
-        chargePersonIds && chargePersonIds.length || usePersonId || opponent) {
+      const listQuery = this.listQuery || {}
+      const { shellIdsLocal, collegeInfoIdLocal, teacherIds, chargePersonIds, usePersonId, opponent } = listQuery
+      if (shellIdsLocal || collegeInfoIdLocal || teacherIds || chargePersonIds || usePersonId || opponent) {
         bol = true
       }
       return bol
@@ -283,14 +283,6 @@ export default {
     },
   },
   methods: {
-    // 设置今日活动默认的部门
-    handleSetNoWDept(val, title) {
-      this.$set(this.listQuery, 'nowActivityshellId', val)
-      this.nowActivityshellIdName = title
-    },
-    dealDateFormat(val) {
-      return dayjs(val).format('YYYY/MM/dd')
-    },
     handleNowShell(e) {
       const { title } = e
       this.nowActivityshellIdName = title || '所属部门'
@@ -306,7 +298,7 @@ export default {
       this.$emit('onListQuery', this.listQuery)
     },
     handleWaitFollowType(e) {
-      this.$set(this.listQuery, 'distributeType', e)
+      this.listQuery.distributeType = e
     },
     onKeywordSearch() {
       this.$emit('onListQuery', this.listQuery)
@@ -342,9 +334,6 @@ export default {
       } else {
         this.handleDateReset()
       }
-    },
-    handleSetDept(nowActivityshellId) {
-      this.$set(this.listQuery, 'nowActivityshellId', nowActivityshellId)
     },
     handleDropOpen(val) {
       this.handleInit()
@@ -399,7 +388,7 @@ export default {
       this.listQuery[name] = !this.listQuery[name]
     },
     handleDateSelect(val) {
-      if (val.filter(item => item).length === 2) {
+      if (val.filter(item => item).length) {
         this.listQuery.startDate = `${dayjs(val[0]).format('YYYY/MM/DD')} 00:00:00 `
         this.listQuery.endDate = `${dayjs(val[1]).format('YYYY/MM/DD')} 23:59:59 `
       }
@@ -443,7 +432,6 @@ export default {
         this.$refs.vanDropItem3.toggle(false)
         this.$refs.vanDropItem4.toggle(false)
       }
-      console.log('this.listQuery', this.listQuery);
       this.$emit('onListQuery', this.listQuery)
     },
 

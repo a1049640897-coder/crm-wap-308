@@ -1,3 +1,5 @@
+
+import dayjs from 'dayjs'
 // 公用校验方法VerifyFunc
 let VerifyFunc = {}
 VerifyFunc.name = function (rule, val, callback) { // 校验名字
@@ -152,11 +154,11 @@ VerifyFunc.number = function (rule, val, callback) { // 校验数字
 }
 VerifyFunc.qq = function (val) { // 校验QQ
   if (!val) return
-  return  /^[1-9][0-9]{4,50}$/.test(val)
+  return /^[1-9][0-9]{4,14}$/.test(val)
 }
 VerifyFunc.wx = function (val) { // 校验微信
   if (!val) return
-  return /^([-_a-zA-Z0-9]{2,50})+$/.test(val)
+  return /^([-_a-zA-Z0-9]{2,19})+$/.test(val)
 }
 VerifyFunc.chinese = function (rule, val, callback) { // 中文汉字
   let regs = /^[\u4E00-\u9FA5]+$/
@@ -198,31 +200,86 @@ VerifyFunc.money = function (rule, val, callback) { // 校验文本字数
 }
 
 
-VerifyFunc.newNumber = function (rule, val, callback) { // 校验数字
+VerifyFunc.newNumber = function (val, rule) { // 校验数字
   let regs = /^[0-9]*$/
-  if (val && !regs.test(val)) {
-    callback(new Error(`只能正整数`))
-  } else {
-    if (val == 0) {
-      callback(new Error(`仅限输入正数`))
-    } else {
-      callback()
-    }
-  }
-}
-VerifyFunc.validatorMoney = function (val, rule) { // 校验金额
-  var reg = /^(([0-9]+)|([0-9]+\.[0-9]{0,2}))$/ 
   const { required } = rule
-  return new Promise((resolve)=>{
-      if(required){
-        if(reg.test(val)){
-          resolve(true)
-        }else {
+  return new Promise((resolve) => {
+    if (required) {
+      if (regs.test(val)) {
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+    } else {
+      resolve(true)
+    }
+  })
+}
+VerifyFunc.time = function (val, rule) { // 校验时间
+  let regs = /^[0-9]*$/
+  const { required, type, hour } = rule
+  //  type 0  小时 1 分钟
+  return new Promise((resolve) => {
+    if (required) {
+      if (regs.test(val)) {
+        if (val.length == 2) {
+          if (!type) {
+            if (Number(val) < 24 || Number(val) == 24) {
+              if (dayjs().hour() == Number(val) || dayjs().hour() > Number(val)) {
+                resolve(true)
+              } else {
+                resolve(false)
+              }
+            } else {
+              resolve(false)
+            }
+          } else {
+            if (hour) {
+              resolve(true)
+            } else {
+              if (dayjs().hour() == Number(hour) || dayjs().hour() > Number(hour)) {
+                resolve(true)
+              } else {
+                if (Number(val) < 60 || Number(val) == 60) {
+                  if ((dayjs().minute() == Number(val) || dayjs().minute() > Number(val))) {
+                    resolve(true)
+                  } else {
+                    resolve(false)
+                  }
+                } else {
+                  resolve(false)
+                }
+              }
+
+            }
+          }
+        } else {
           resolve(false)
         }
-      }else {
-        resolve(true)
+      } else {
+        resolve(false)
       }
+    } else {
+      resolve(true)
+    }
+  })
+}
+
+
+
+VerifyFunc.validatorMoney = function (val, rule) { // 校验金额
+  var reg = /^(([0-9]+)|([0-9]+\.[0-9]{0,2}))$/
+  const { required } = rule
+  return new Promise((resolve) => {
+    if (required) {
+      if (reg.test(val)) {
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+    } else {
+      resolve(true)
+    }
   })
 }
 
@@ -230,13 +287,13 @@ VerifyFunc.validatorMoney = function (val, rule) { // 校验金额
 VerifyFunc.validatorNumber = function (val, rule) { // 校验数量
   const { required } = rule
   return new Promise(resolve => {
-    if(required){
+    if (required) {
       if (val && /^[+]{0,1}(\d+)$/.test(val)) {
         resolve(true)
       } else {
         return resolve(false)
       }
-    }else {
+    } else {
       resolve(true)
     }
 

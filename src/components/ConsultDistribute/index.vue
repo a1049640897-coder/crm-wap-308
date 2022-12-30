@@ -12,7 +12,7 @@
         <div class="common-popup-body">
           <van-form ref="ConsultDistributeForm" @submit="handleConfirm" :show-error-message="false" validate-trigger="onSubmit">
             <RePick ref="consultantRef" v-model="listQuery.batchNumbersLocal.id" label="咨询" :list="counselorList" @change="handleUserDeaprtment" name="consultantId" titleKey="name" isShowSearch isRequrie isCell />
-            <RePick ref="consultantDepartRef" v-model="listQuery.batchNumbersLocal.sysShellId" :disabled="departList.length === 1" label="所属部门" :list="departList" name="branchId" idKey="value" titleKey="text" isShowSearch isRequrie isCell />
+            <RePick ref="consultantDepartRef" v-model="listQuery.batchNumbersLocal.sysShellId" label="所属部门" :list="departList" name="branchId" idKey="value" titleKey="text" isShowSearch isRequrie isCell />
             <div class="common-popup-footer">
               <van-button style="width: 8rem; margin-right: 1rem;" native-type="button" @click="handleClose">取消</van-button>
               <van-button type="info" style="width: 8rem;" native-type="submit">分配</van-button>

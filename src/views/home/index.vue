@@ -18,13 +18,13 @@
         </div>
       </div>
       <div class="home-quick-list">
-        <div class="home-q-l-item" v-for="item in btnList" :key="item.title" @click="handleRoute(item)" v-show="item.isShow">
+        <div class="home-q-l-item" v-for="item in showBtnList" :key="item.title" @click="handleRoute(item)" v-show="item.isShow">
           <img class="home-q-l-item-img" :src="item.icon" alt="">
           <div class="home-q-l-item-title">{{item.title}}</div>
         </div>
       </div>
     </div>
-    <QuickMenu :isOpen.sync="isQuickMenuDialog" :btnListProp="btnList" quickName="homeBtn" @onDealBtnList="handleDealBtnList" />
+    <QuickMenu :isOpen.sync="isQuickMenuDialog" :btnListProp="showBtnList" quickName="homeBtn" @onDealBtnList="handleDealBtnList" />
   </div>
 </template>
 
@@ -42,7 +42,7 @@ export default {
     return {
       isQuickMenuDialog: false,
       waitList: [
-        { title: '待办事项', icon: require('@/assets/images/home/waitTodo.png'), path: '/waittodo', name: 'home-WaitTodo', num: 99, query: {} },
+        { title: '待办事项', icon: require('@/assets/images/home/waitTodo.png'), path: 'waittodo', name: 'home-WaitTodo', num: 99, query: {} },
         { title: '消息通知', icon: require('@/assets/images/home/waitMsg.png'), path: '', name: '', num: 2, query: {} },
       ],
       btnList: [
@@ -62,8 +62,14 @@ export default {
 
         { id: 12, num: 11, title: '报名订单', icon: require('@/assets/images/home/bmdd.png'), path: '', name: '', query: {}, isShow: true },
         { id: 13, num: 12, title: '报名收款', icon: require('@/assets/images/home/bmsk.png'), path: '', name: '', query: {}, isShow: true },
-        { id: 14, num: 13, title: '课程包收款', icon: require('@/assets/images/home/kcbsk.png'), path: '', name: '', query: {}, isShow: true },
+        { id: 14, num: 13, title: '课程包收款', icon: require('@/assets/images/home/kcbsk.png'), path: '/courseManage', name: 'courseManage-index', query: { cooperationType: 0 }, isShow: true },
+        { id: 14, num: 13, title: '课程包收款(合作院校)', icon: require('@/assets/images/home/kcbsk.png'), path: '/courseManage', name: 'courseManage-index', query: { cooperationType: 1 }, isShow: true },
       ]
+    }
+  },
+  computed: {
+    showBtnList() {
+      return this.btnList
     }
   },
   created() {

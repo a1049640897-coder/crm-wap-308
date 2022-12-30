@@ -1,16 +1,16 @@
 <template>
   <div>
-    <van-search class="searchInput" v-model="listQuery.param.keyword" placeholder="请输入学员姓名、手机号码、微信、QQ" show-action background="#ffffff" @search="handleRefresh" @clear="handleClear">
+    <van-search class="searchInput" v-model="listQuery.param.keyword" placeholder="请输入学员姓名、手机号码、微信、QQ" show-action background="#ffffff">
       <template #action>
-        <div @click="handleRefresh">搜索</div>
+        <div @click="handleSearch">搜索</div>
       </template>
     </van-search>
     <div>
       <RMList :moreLoading.sync="moreLoading" :refreshing.sync="refreshing" :finished.sync="finished" @onLoad="handleLoad" @onRefresh="handleRefresh" :tableList="tableList">
-        <div>
-          <StudentCard v-for="(item, index) in tableList" :key="item.id" :sId="item.id" :studentData="item" @onUpdataInfo="handleUpdataInfo($event, item, index)" listType="6" />
-        </div>
-      </RMList>
+      <div>
+        <StudentCard v-for="(item, index) in tableList" :key="item.id" :sId="item.id" :studentData="item" @onUpdataInfo="handleUpdataInfo($event, item, index)" listType="search" />
+      </div>
+    </RMList>
     </div>
   </div>
 </template>
@@ -35,8 +35,7 @@ export default {
         param: {
           keyword: '',
           type: '6',
-          dateType: '1',
-          showConsultRecord: 1
+          dateType: '1'
         }
       },
       moreLoading: false,
@@ -75,21 +74,20 @@ export default {
         this.$loading(false, 'SearchStudent')
       })
     },
-    handleClear() {
-      this.listQuery.keyword = ''
-      this.tableList = []
+    handleSearch() {
+      this.handleRefresh()
     },
     handleLoad() {
       this.listQuery.pageinfo.pageNum += 1
       this.getTableList('more')
     },
-
+    
     handleRefresh() {
       this.listQuery.pageinfo.pageNum = 1
       this.finished = false
       this.getTableList('refresh')
     },
-
+    
     handleUpdataInfo(obj, item, index) {
       this.tableList.splice(index, 1, obj)
     },
@@ -104,7 +102,7 @@ export default {
     border: 1px solid #f3f3f3;
     border-radius: 0.3rem;
     /deep/input {
-      caret-color: #0088fe;
+      caret-color: #0088FE;
     }
   }
 }

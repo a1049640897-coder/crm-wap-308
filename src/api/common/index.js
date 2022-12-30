@@ -56,6 +56,14 @@ export function getDemandType(callIndex) {
   })
 }
 
+// 通用选项 - (业绩区域)
+export function commonCaspasgeApi(callIndex) {
+  return request({
+    url: `/order/common/condition/${callIndex}`,
+    method: 'get'
+  })
+}
+
 // 获取当前系统设置模块的配置信息（年份是否必填和是否区分在校生等）
 export function configIsRequire() {
   return request({
@@ -184,3 +192,26 @@ export function getActiveListDetail(id, type) {
     method: 'get'
   })
 }
+
+// 获取支付方式
+export function getPaymentTypeApi(data) {
+  return request({
+    url: 'order/common/paymentType',
+    method: 'get',
+    data
+  })
+}
+
+// 获取选择器 当前学历:xl 资格证类型:zgzlx 所在年级:sznj
+export function getCascadeSelectDataApi(callIndex) {
+  return request(`/order/common/cascade/${callIndex}`, {
+    method: 'GET'
+  })
+}
+
+
+
+
+
+
+

@@ -4,13 +4,13 @@
       <van-dropdown-menu class="hf-l-list-menu">
         <!-- 状态 :title-class="isHtab1 ? 'common-act-color' : ''" -->
         <van-dropdown-item v-if="['1', '4', '5', '7'].includes(listType)" title="状态" title-class="common-act-color" @open="handleDropOpen(1)" ref="vanDropItem1">
-          <div class="hf-drop-view" v-if="stateList.length">
+          <div class="hf-drop-view" v-if="queryList.stateList.length">
             <div class="hf-drop-contain">
               <div class="hr-drop-filter-item" @click="handleType(null)">
                 <van-icon v-if="listQuery.currentState && !listQuery.currentState.length" name="success" color="#0088FE" />
                 <span :class="{'hr-drop-filter-item-act': listQuery.currentState && !listQuery.currentState.length }">全部</span>
               </div>
-              <div class="hr-drop-filter-item" @click="handleType(item.value)" v-for="item in stateList" :key="item.id">
+              <div class="hr-drop-filter-item" @click="handleType(item.value)" v-for="item in queryList.stateList" :key="item.id">
                 <van-icon v-if="listQuery.currentState && listQuery.currentState.includes(item.value)" name="success" color="#0088FE" />
                 <span :class="{'hr-drop-filter-item-act': listQuery.currentState && listQuery.currentState.includes(item.value) }">{{item.text}}</span>
               </div>
@@ -95,7 +95,7 @@
               <div class="hf-drop-quick-item" v-if="['1', '5'].includes(listType)">
                 <div class="hf-drop-quick-title">回访周期</div>
                 <div class="hf-drop-quick-list">
-                  <div class="hf-drop-quick-list-item" :class="{ 'hf-drop-quick-list-item-act': listQuery.statisticsType === item.id }" @click="handleReturnVisit(item.id)" v-for="item in queryList.filterDateRange" :key="item.id">{{item.title}}</div>
+                  <div class="hf-drop-quick-list-item" :class="{ 'hf-drop-quick-list-item-act': listQuery.returnVisitType === item.id }" @click="handleReturnVisit(item.id)" v-for="item in queryList.filterDateRange" :key="item.id">{{item.title}}</div>
                 </div>
               </div>
               <!-- 用户标签 -->
@@ -126,7 +126,7 @@
               <div class="hf-drop-quick-item" v-if="['1', '5', '7'].includes(listType)">
                 <div class="hf-drop-quick-title">排序规则</div>
                 <div class="hf-drop-quick-list">
-                  <ReSort v-model="listQuery.sortRule" :info="item" v-for="(item, index) in sortRuleList" :key="index" />
+                  <ReSort v-model="listQuery.sortRule" :info="item" v-for="(item, index) in queryList.sortRuleList" :key="index" />
                 </div>
               </div>
             </div>
@@ -137,46 +137,43 @@
           </div>
         </van-dropdown-item>
         <!-- 日期类型 -->
-        <<<<<<< HEAD <van-dropdown-item v-if="['1', '4', '5', '7'].includes(listType)" :title="listType == 4 ? '添加日期' : '日期类型'" :title-class="isHtab4 ? 'common-act-color' : ''" @open="handleDropOpen(4)" ref="vanDropItem4">
-          =======
-          <van-dropdown-item v-if="['1', '4', '5', '7'].includes(listType)" :title="listType == 4 ? '添加日期' : '日期类型'" :title-class="isHtab4 ? 'common-act-color' : ''" @open="handleDropOpen(4)" ref="vanDropItem4">
-            >>>>>>> origin/feature-302
-            <div class="hf-drop-view">
-              <div class="hf-drop-quick" style="margin-top: 0;">
-                <div class="hf-drop-quick-item" style="margin-bottom: 0;">
-                  <!-- <div class="hf-drop-quick-title">回访周期</div> -->
-                  <div class="hf-drop-quick-list" v-if="listType != 4">
-                    <div class="hf-drop-quick-list-item" :class="{ 'hf-drop-quick-list-item-act': listQuery.dateType === item.value }" @click="handleDateType(item.value)" v-for="item in queryList.dateTypeList" :key="item.id">{{item.text}}</div>
-                  </div>
-                  <ReQuickDateBtns :startData="listQuery.startDate" :endData="listQuery.endDate" @change="handleQuickDate" style="margin-top: 1rem;" />
-                  <div class="hf-drop-quick-calendar">
-                    <van-calendar ref="vanCalendar" :formatter="dayTextFormatter" @select="handleDateSelect" :default-date="defaultDate" :poppable="false" type="range" :show-title="false" color="#0088FE" :show-confirm="false" allow-same-day :min-date="new Date('2013/01/01')" :style="{ height: '400px' }" />
-                  </div>
+        <van-dropdown-item v-if="['1', '4', '5', '7'].includes(listType)" title="日期类型" title-class="common-act-color" @open="handleDropOpen(4)" ref="vanDropItem4">
+          <div class="hf-drop-view">
+            <div class="hf-drop-quick" style="margin-top: 0;">
+              <div class="hf-drop-quick-item" style="margin-bottom: 0;">
+                <!-- <div class="hf-drop-quick-title">回访周期</div> -->
+                <div class="hf-drop-quick-list">
+                  <div class="hf-drop-quick-list-item" :class="{ 'hf-drop-quick-list-item-act': listQuery.dateType === item.value }" @click="handleDateType(item.value)" v-for="item in queryList.dateTypeList" :key="item.id">{{item.text}}</div>
+                </div>
+                <ReQuickDateBtns :startData="listQuery.startDate" :endData="listQuery.endDate" @change="handleQuickDate" style="margin-top: 1rem;" />
+                <div class="hf-drop-quick-calendar">
+                  <van-calendar ref="vanCalendar" :formatter="dayTextFormatter" @select="handleDateSelect" :default-date="defaultDate" :poppable="false" type="range" :show-title="false" color="#0088FE" :show-confirm="false" allow-same-day :min-date="new Date('2013/01/01')" :style="{ height: '400px' }" />
                 </div>
               </div>
-              <div class="common-double-button">
-                <van-button class="common-double-button-l" @click="handleReset(4)">重置</van-button>
-                <van-button class="common-double-button-r" @click="handleConfirm">确定</van-button>
-              </div>
             </div>
-          </van-dropdown-item>
-          <!-- 分配转交日期 -->
-          <van-dropdown-item v-if="['8', 'yuYueZiXun'].includes(listType)" :title="listType === '8' ? '分配转交日期' : listType === 'yuYueZiXun' ? '预约日期' : ''" :title-class="isHtab9 ? 'common-act-color' : ''" @open="handleDropOpen(9)" ref="vanDropItem9">
-            <div class="hf-drop-view">
-              <div class="hf-drop-quick" style="margin-top: 0;">
-                <div class="hf-drop-quick-item" style="margin-bottom: 0;">
-                  <ReQuickDateBtns :startData="listQuery.distributeStartDate" :endData="listQuery.distributeEndDate" @change="handleDisAndOverQuickDate" style="margin-top: 1rem;" />
-                  <div class="hf-drop-quick-calendar">
-                    <van-calendar ref="vanDisAndOverCalendar" :formatter="dayTextFormatter" @select="handleDisAndOverDateSelect" :default-date="defaultDisAndOverDate" :poppable="false" type="range" :show-title="false" color="#0088FE" :show-confirm="false" allow-same-day :min-date="new Date('2013/01/01')" :style="{ height: '400px' }" />
-                  </div>
+            <div class="common-double-button">
+              <van-button class="common-double-button-l" @click="handleReset(4)">重置</van-button>
+              <van-button class="common-double-button-r" @click="handleConfirm">确定</van-button>
+            </div>
+          </div>
+        </van-dropdown-item>
+        <!-- 分配转交日期 -->
+        <van-dropdown-item v-if="['8', 'yuYueZiXun'].includes(listType)" :title="listType === '8' ? '分配转交日期' : listType === 'yuYueZiXun' ? '预约日期' : ''" :title-class="isHtab9 ? 'common-act-color' : ''" @open="handleDropOpen(9)" ref="vanDropItem9">
+          <div class="hf-drop-view">
+            <div class="hf-drop-quick" style="margin-top: 0;">
+              <div class="hf-drop-quick-item" style="margin-bottom: 0;">
+                <ReQuickDateBtns :startData="listQuery.distributeStartDate" :endData="listQuery.distributeEndDate" @change="handleDisAndOverQuickDate" style="margin-top: 1rem;" />
+                <div class="hf-drop-quick-calendar">
+                  <van-calendar ref="vanDisAndOverCalendar" :formatter="dayTextFormatter" @select="handleDisAndOverDateSelect" :default-date="defaultDisAndOverDate" :poppable="false" type="range" :show-title="false" color="#0088FE" :show-confirm="false" allow-same-day :min-date="new Date('2013/01/01')" :style="{ height: '400px' }" />
                 </div>
               </div>
-              <div class="common-double-button">
-                <van-button class="common-double-button-l" @click="handleReset(8)">重置</van-button>
-                <van-button class="common-double-button-r" @click="handleConfirm">确定</van-button>
-              </div>
             </div>
-          </van-dropdown-item>
+            <div class="common-double-button">
+              <van-button class="common-double-button-l" @click="handleReset(8)">重置</van-button>
+              <van-button class="common-double-button-r" @click="handleConfirm">确定</van-button>
+            </div>
+          </div>
+        </van-dropdown-item>
       </van-dropdown-menu>
     </div>
     <div class="hf-r-list" v-show="!isActSearch">
@@ -212,25 +209,27 @@
         </div>
         <div class="common-popup-body moreContain-body">
           <van-form ref="filterForm" :show-error-message="false" validate-trigger="" :submit-on-enter="false">
+            <RePick v-if="['yuYueZiXun'].includes(listType)" v-model="listQuery.shellIdsLocal" label="活动部门" @change="handleYYZXdepart" :list="yyzxDepartList" isCell clearable />
+            <RePick v-if="['yuYueZiXun'].includes(listType)" v-model="listQuery.activityId" label="活动名称" :list="yyzxActiveList" isCell clearable />
             <RePick v-model="listQuery.shellIdsLocal" label="所属部门" :list="authDepartList" isCascader isShowSearch isCell clearable childrenKey="child" />
             <RePick v-model="listQuery.schoolIdLocal" label="就读学校" :list.sync="schoolList" isCascader isShowSearch isCell clearable isOriginSchoolSearch />
             <RePick v-model="listQuery.areaId" label="市场区域" :list="authAreaList" multiple isCell clearable />
             <!-- <RePick v-model="listQuery.graduationYearLocal" label="毕业年份" :list="graduationList" titleKey="text" idKey="value" isCell clearable /> -->
-            <ReYear v-model="listQuery.graduationYearLocal" label="毕业年份" clearable />
+            <ReYear v-model="listQuery.graduationYearLocal" label="毕业年份" />
             <RePick v-model="listQuery.isFreshLocal" label="属性" :list="isFreshList" titleKey="text" idKey="value" isCell clearable />
             <!-- 考试年份/考试界别 -->
             <!-- <RePick v-model="listQuery.examYearLocal" :label="examYearText" :list="yearList" titleKey="text" idKey="value" isCell clearable /> -->
-            <ReYear v-model="listQuery.examYearLocal" :label="examYearText" clearable />
-            <RePick v-if="['1', 'yuYueZiXun', '8', '7', '5'].includes(listType)" v-model="listQuery.consultTypeLocal" label="咨询类型" :list="consultTypeList" titleKey="text" idKey="value" isCell clearable />
+            <ReYear v-model="listQuery.examYearLocal" :label="examYearText" />
+            <RePick v-if="['1', 'yuYueZiXun', '8', '4', '7'].includes(listType)" v-model="listQuery.consultTypeLocal" label="咨询类型" :list="consultTypeList" titleKey="text" idKey="value" isCell clearable />
             <RePick v-if="['yuYueZiXun'].includes(listType)" v-model="listQuery.resultIdLocal" label="咨询结果" :list="resultList" isCell clearable />
             <RePick v-if="['1', 'yuYueZiXun', '8', '5', '7'].includes(listType)" v-model="listQuery.intentionCourseIds" label="意向班型" :list="classList" multiple titleKey="text" idKey="value" isShowSearch isCell clearable />
             <RePick v-model="listQuery.cityId" label="所在城市" :list="cityTreeList" isCascader isShowSearch titleKey="text" idKey="id" isCell clearable childrenKey="children" />
             <RePick v-model="listQuery.sourceId" label="来源渠道" :list="sourceList" isCascader isShowSearch titleKey="text" idKey="id" isCell clearable childrenKey="children" />
             <RePick v-model="listQuery.campusLocal" label="市场区域负责人" :list="campusLis" titleKey="text" idKey="value" isShowSearch isCell clearable />
             <RePick v-if="['1', '4', '8'].includes(listType)" v-model="listQuery.ownLocal" label="所属人" :list="ownList" titleKey="text" idKey="value" isShowSearch isCell clearable />
-            <RePick v-if="['yuYueZiXun'].includes(listType)" v-model="listQuery.consultantIdLocal" label="咨询/市场" :list="consultantList" isShowSearch isCell clearable />
-            <RePick v-if="['7'].includes(listType)" v-model="listQuery.seaPutUserIdsLocal" label="投放人" :list="setPutList" isCell clearable isShowSearch />
-            <RePick v-if="['7'].includes(listType)" v-model="listQuery.creatorIdsLocal" label="添加人" :list="setPutList" isCell clearable isShowSearch />
+            <RePick v-if="['yuYueZiXun'].includes(listType)" v-model="listQuery.consultantIdLocal" label="咨询/市场" :list="consultantList" isCell clearable />
+            <RePick v-if="['7'].includes(listType)" v-model="listQuery.seaPutUserIdsLocal" label="投放人" :list="setPutList" isCell clearable />
+            <RePick v-if="['7'].includes(listType)" v-model="listQuery.creatorIdsLocal" label="添加人" :list="setPutList" isCell clearable />
           </van-form>
         </div>
         <div class="common-popup-footer">
@@ -243,6 +242,7 @@
 </template>
 
 <script>
+import { yuYueZixunActiveApi } from '@/api/potentialGuest/consultation'
 import { dayTextFormatter } from '@/utils'
 import { mapState } from 'vuex'
 import dayjs from 'dayjs'
@@ -267,11 +267,9 @@ export default {
       defaultDate: null,
       defaultDisAndOverDate: null,
       listQuery: {},
-      schoolList: []
+      schoolList: [],
+      yyzxActiveList: []
     }
-  },
-  created() {
-    console.log('yuYueZiXunstateList::', this.queryList.yuYueZiXunstateList);
   },
   computed: {
     ...mapState({
@@ -289,24 +287,15 @@ export default {
       cityTreeList: state => state.common.setting.allProvicesAndCitys,
       campusLis: state => state.consultation.queryList.campusLis,
       setPutList: state => state.consultation.queryList.setPutList,
+      yyzxDepartList: state => state.consultation.yyzxDepartList,
       resultList: state => state.consultation.yyzxQueryList.resultList,
       consultantList: state => state.consultation.yyzxQueryList.consultantList,
-      examYearText: state => state.common.setting.examYearText,
-      stateList(state) {
-        if (this.listType == 4) {
-          return state.consultation.queryList.noCounselStateList
-        } else return state.consultation.queryList.stateList
-      },
-      sortRuleList(state) {
-        if (this.listType == 7) {
-          return state.consultation.queryList.sortSeasRuleList
-        } else return state.consultation.queryList.sortRuleList
-      }
+      examYearText: state => state.common.setting.examYearText
     }),
     isMoreAct() {
       let bol = false
       const listQuery = this.paramProp || {}
-      if (listQuery.shellIdsLocal || listQuery.schoolIdLocal || listQuery.isFreshLocal || (listQuery.areaId && listQuery.areaId.length) || listQuery.graduationYearLocal || listQuery.isFreshLoca || listQuery.examYearLocal || listQuery.consultTypeLocal || (listQuery.intentionCourseIds && listQuery.intentionCourseIds.length) || listQuery.cityId || listQuery.sourceId || listQuery.campusLocal || listQuery.ownLocal || listQuery.activityId || listQuery.resultIdLocal || listQuery.consultantIdLocal || listQuery.seaPutUserIdsLocal || listQuery.creatorIdsLocal) {
+      if (listQuery.shellIdsLocal || listQuery.schoolIdLocal || (listQuery.areaId && listQuery.areaId.length) || listQuery.graduationYearLocal || listQuery.isFreshLoca || listQuery.examYearLocal || listQuery.consultTypeLocal || (listQuery.intentionCourseIds && listQuery.intentionCourseIds.length) || listQuery.cityId || listQuery.sourceId || listQuery.campusLocal || listQuery.ownLocal || listQuery.activityId || listQuery.resultIdLocal || listQuery.consultantIdLocal || listQuery.seaPutUserIdsLocal || listQuery.creatorIdsLocal) {
         bol = true
       }
       return bol
@@ -330,13 +319,6 @@ export default {
       } else if (this.paramProp.noneHigh || this.paramProp.handover || this.paramProp.visit) {
         isShow = true
       } else if (this.listType === '4' ? false : this.paramProp.sortRule && Object.keys(this.paramProp.sortRule).length) {
-        isShow = true
-      }
-      return isShow
-    },
-    isHtab4() {
-      let isShow = this.listType !== '4'
-      if (this.paramProp.startDate) {
         isShow = true
       }
       return isShow
@@ -430,7 +412,7 @@ export default {
     },
     // 状态
     handleType(val) {
-      this.listQuery.currentState = val || val == 0 ? [val] : []
+      this.listQuery.currentState = val ? [val] : []
     },
     // 预约状态
     handleYuYueType(val) {
@@ -447,6 +429,7 @@ export default {
     },
     // 快捷筛选
     handleStatics(id) {
+      this.listQuery.returnVisitType = null
       if (this.listQuery.statisticsType === id) {
         this.listQuery.statisticsType = null
       } else {
@@ -455,12 +438,13 @@ export default {
     },
     // 回访周期
     handleReturnVisit(id) {
-      if (this.listQuery.statisticsType === id) {
-        this.listQuery.statisticsType = null
+      this.listQuery.statisticsType = null
+      if (this.listQuery.returnVisitType === id) {
+        this.listQuery.returnVisitType = null
         this.listQuery.startDate = null
         this.listQuery.endDate = null
       } else {
-        this.listQuery.statisticsType = id
+        this.listQuery.returnVisitType = id
         if (id === 6) {
           this.listQuery.endDate = dayjs().format('YYYY/MM/DD')
         } else if (id === 7) {
@@ -512,25 +496,20 @@ export default {
     },
     handleReset(num) {
       if (num === 1) {
-        this.listQuery.dateType = this.listType === '4' ? 1 : this.listType === '1' ? 3 : 2
+        this.listQuery.dateType = 4
         this.listQuery.currentState = []
       } else if (num === 2) {
         this.listQuery.intentionIds = []
       } else if (num === 3) {
-        this.listQuery.statisticsType = null
+        this.listQuery.returnVisitType = null
         this.listQuery.consultState = null
-        this.listQuery.handover = ['7', '8'].includes(this.listType) ? 0 : 1
-        this.listQuery.noneHigh = ['3', '7', '8'].includes(this.listType) ? 0 : 1
-        this.listQuery.visit = ['4', '7', '8'].includes(this.listType) ? 0 : 1
-        this.listQuery.sortRule = this.listType === '1' ? { title: '最后回访', type: 1, column: "lastConsultTime" }
-          : this.listType === '4' ? { title: '添加日期', type: 1, column: 'addTime' }
-            : this.listType === '5' ? { title: '添加日期', type: 1, column: 'addTime' }
-              : this.listType === '7' ? { title: '投放日期', type: 1, column: 'seaPutTime' }
-                : this.listType === '8' ? { title: '添加日期', type: 1, column: 'addTime' }
-                  : this.listType === 'yuYueZiXun' ? { title: '添加日期', type: 1, column: 'addTime' } : {}
+        this.listQuery.handover = 1
+        this.listQuery.noneHigh = 1
+        this.listQuery.visit = 0
+        this.listQuery.sortRule = { title: '咨询日期', type: 1, column: "consultTime" }
       } else if (num === 4) {
         this.handleDateReset()
-        this.listQuery.dateType = this.listType === '4' ? 1 : this.listType === '1' ? 3 : 2
+        this.listQuery.dateType = this.listType === '1' ? 3 : 2
         this.listQuery.startDate = null
         this.listQuery.endDate = null
       } else if (num === 8) {
@@ -538,6 +517,14 @@ export default {
         this.listQuery.distributeType = null
         this.listQuery.distributeStartDate = null
         this.listQuery.distributeEndDate = null
+      }
+      else if (num === 9) {
+        this.handleDisAndOverDateReset()
+        this.listQuery.shellIds = []
+        this.listQuery.activityId = null
+        this.listQuery.distributeStartDate = null
+        this.listQuery.distributeEndDate = null
+        this.listQuery.sortRule = { title: '添加日期', type: 1, column: "addTime" }
       } else if (num === 'yuyue') {
         this.listQuery.yuYuetZiXunType = 8
       }
@@ -598,6 +585,16 @@ export default {
       // }).catch(rec => {
       //   console.log(rec, 2)
       // })
+    },
+    handleYYZXdepart(e) {
+      this.yyzxActiveList = []
+      if (e) {
+        yuYueZixunActiveApi([e]).then(res => {
+          this.yyzxActiveList = res.data || []
+        })
+      } else {
+        this.listQuery.activityId = null
+      }
     }
   }
 }

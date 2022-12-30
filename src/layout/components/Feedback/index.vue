@@ -16,7 +16,7 @@
     </div>
 
     <div v-show="isShow">
-      <div class="common-bottom-btns" v-for="(item,index) in columnBarList" :key="index" v-show="itemShowFilter(item)" :style="item.style">
+      <div class="common-bottom-btns" v-for="(item,index) in columnBarList" :key="index" v-show="item.isShow" :style="item.style">
         <div class="common-bottom-btn" @click="handleOpenBtns(item)" :id='item.id' :style="item.style">
           <img :src="`${item.src}`" alt="">
           <span>{{item.title}}</span>
@@ -30,7 +30,6 @@
 
 <script>
 import draggableMixin from "@/utils/draggable";
-import { mapState } from 'vuex'
 
 export default {
   mixins: [draggableMixin],
@@ -51,24 +50,21 @@ export default {
           style: 'bottom: 8rem',
           src: require("@/assets/images/icons/home.png"),
           isShow: true
-        }
+        },
       ]
     };
   },
   computed: {
     isShow() {
       let isShow = true
-      console.log(this.$route);
       if (this.$route.meta.isCloseWorkOrder) isShow = false
+      if (this.$route.meta.isCloseBackHome) {
+        this.$set(this.columnBarList[1], 'isShow', false)
+      }
       return isShow
-    }
+    },
   },
   methods: {
-    itemShowFilter(item) {
-      if (item.title === '返回首页' && this.$route.name === 'home-index') {
-        return false
-      } else return item.isShow
-    },
     handleOpenBtns(e) {
       if (e.title == '提交工单') {
         this.btnshow = !this.btnshow;
@@ -144,7 +140,6 @@ export default {
       display: flex;
       align-items: center;
       padding: 0 0.3rem;
-      font-size: 0.9rem;
     }
     .img {
       margin-right: 0.1rem;

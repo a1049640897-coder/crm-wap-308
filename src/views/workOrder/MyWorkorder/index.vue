@@ -64,7 +64,7 @@ import {
   workOrderTyperevokeApi,
 } from "@/api/workOrder";
 export default {
-  name: "workOrder-myworkorder",
+  name: "MyWorkorder",
   components: {
     RMList: () => import("@/components/ReComponents/RMList"),
     Screen: () => import("@/views/workOrder/MyWorkorder/components/Screen.vue"),
@@ -107,16 +107,10 @@ export default {
     window.removeEventListener("scroll", this.handleScroll);
   },
   mounted() {
-    this.handleInit()
+    this.getTableList();
     this.handleScrollInit();
   },
   methods: {
-    handleInit() {
-      if (this.$route.query && this.$route.query.id) {
-        this.listQuery.param.keyword = this.$route.query.id
-      }
-      this.getTableList('init');
-    },
     handleScroll() {
       getScrollTop().then((height) => {
         this.height = height;
@@ -160,72 +154,58 @@ export default {
       }
     },
     // 获取列表数据
-    getTableList(val) {
+    getTableList() {
       this.loading = true;
-      this.$loading(true, 'myWorkOrderList');
-      myworkOrderApi(this.listQuery).then(res => {
-        if (['init', 'refresh'].includes(val)) {
-          this.tableList = res.data || []
-        } else if (['urge'].includes(val)) {
-          this.tableList = res.data || []
-        } else {
-          this.tableList = this.tableList.concat(res.data || [])
-        }
-        if (res.data.length < this.listQuery.pageInfo.pageSize) {
-          this.finished = true
-        }
-      }).finally(() => {
-        this.listQuery.param.pageNum = 20
-        this.$nextTick(() => {
-          this.refreshing = false;
-          this.loading = false;
+      this.$loading(true);
+      myworkOrderApi(this.listQuery)
+        .then((res) => {
+          this.tableList = [...this.tableList, ...res.data] || [];
+          if (res.data.length < this.listQuery.pageInfo.pageSize) {
+            this.finished = true
+          }
+        })
+        .finally(() => {
+          this.$nextTick(() => {
+            this.refreshing = false;
+            this.loading = false;
+          });
+          this.$loading(false);
         });
-        this.$loading(false, 'myWorkOrderList');
-      })
     },
     // 重置列表
     resetPage() {
       this.tableList = [];
       this.listQuery.pageInfo.pageNum = 1;
-      this.getTableList('init');
+      this.getTableList();
     },
     handleSearch() {
-      this.finished = false
-      this.listQuery.pageInfo.pageNum = 1;
-      this.getTableList('init')
+      this.resetPage();
     },
     handleClear() {
-      this.finished = false
-      this.listQuery.pageInfo.pageNum = 1;
-      this.getTableList('init');
+      this.resetPage();
     },
-    handleChangeBox() {
+    handleChangeBox(names) {
       this.loading = false
       this.finished = false
-      this.listQuery.pageInfo.pageNum = 1;
-      this.getTableList('init')
+      this.resetPage();
     },
     // 下拉刷新
     handleRefresh() {
       this.refreshing = true;
-      this.listQuery.pageInfo.pageNum = 1;
       this.finished = false
-      this.getTableList('refresh')
+      this.resetPage();
     },
     // 触底加载
     handleLoad() {
+      // this.loading = true
       this.listQuery.pageInfo.pageNum += 1;
-      this.getTableList('more');
+      this.getTableList();
     },
     // 点击催促
     handelurge(item) {
       workOrderTypeurgeApi(item.id).then(() => {
         Toast.success("已联系管理员处理，请耐心等待");
-        this.finished = false
-        this.listQuery.pageInfo.pageNum = 1
-        this.getTableList('urge')
-      }).finally(() => {
-        window.scrollTo(0, this.height);
+        this.resetPage();
       });
     },
     // 编辑
@@ -246,30 +226,23 @@ export default {
       }).then(() => {
         workOrderTyperevokeApi(item.id).then(res => {
           if (res.status === 200) {
-            this.finished = false
-            this.listQuery.pageInfo.pageNum = 1
-            this.getTableList('urge')
+            this.tableList = []
+            this.resetPage()
           }
         });
       }).catch(() => {
-      }).finally(() => {
-        window.scrollTo(0, this.height);
-
+        console.log("取消");
       });
     },
     handleScreenShow() {
       this.screenShow = true;
     },
     onComplete(val) {
-      const { dateType, startDate, endDate, systemId } = val
-      this.loading = false
-      this.finished = false
-      this.listQuery.param.dateType = dateType;
-      this.listQuery.param.startDate = startDate;
-      this.listQuery.param.endDate = endDate;
-      this.listQuery.param.systemId = systemId;
-      this.listQuery.pageInfo.pageNum = 1;
-      this.getTableList('init');
+      this.listQuery.param.dateType = val.dateType;
+      this.listQuery.param.startDate = val.startDate;
+      this.listQuery.param.endDate = val.endDate;
+      this.listQuery.param.systemId = val.systemId;
+      this.resetPage();
     },
     handleToDetail(val) {
       this.$router.push({
@@ -343,7 +316,7 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          margin: 1rem 0;
+          margin: 1.5rem 0;
         }
         .left-date {
           font-size: 0.86rem;

@@ -11,9 +11,9 @@
         </div>
         <div class="common-popup-body">
           <van-form ref="ConsultDeliverForm" @submit="handleConfirm" :show-error-message="false" validate-trigger="onSubmit">
-            <RePick ref="rawUserIdRef" v-model="listQuery.rawUserId" label="原所属人" :disabled="ownList.length === 1" :list="ownList" @change="handleRawUser" name="handoverShellId" isRequrie isCell />
+            <RePick ref="rawUserIdRef" v-model="listQuery.rawUserId" label="原所属人" :list="ownList" @change="handleRawUser" name="handoverShellId" isRequrie isCell />
             <RePick ref="newOwnRef" v-model="listQuery.newOwnId" label="新所属人" :list="newOwnList" @change="handleNewOwnRef" name="sysId" titleKey="name" isShowSearch isRequrie isCell />
-            <RePick ref="shellIdRef" v-model="listQuery.shellId" label="所属部门" :list="shellList" name="shellId" idKey="value" titleKey="text" isRequrie isCell :disabled="shellList.length === 1" />
+            <RePick ref="shellIdRef" v-model="listQuery.shellId" label="所属部门" :list="shellList" name="shellId" idKey="value" titleKey="text" isRequrie isCell />
             <div class="common-popup-footer">
               <van-button style="width: 8rem; margin-right: 1rem;" native-type="button" @click="handleClose">取消</van-button>
               <van-button type="info" style="width: 8rem;" native-type="submit">移交</van-button>
@@ -126,12 +126,6 @@ export default {
     handleOwnList(resolve) {
       getDeliverListApi(this.sId).then(res => {
         this.ownList = res.data || []
-        this.$nextTick(() => {
-          if (this.ownList.length === 1) {
-            this.listQuery.rawUserId = this.ownList[0].id
-            this.handleRawUser(this.listQuery.rawUserId)
-          }
-        })
         resolve()
       }).catch(() => {
         this.$emit('update:isOpen', false)
@@ -171,18 +165,14 @@ export default {
     handleClearNewOwn() {
       this.listQuery.newOwnId = null
       this.newOwnList = []
-      if (this.$refs.newOwnRef) {
-        this.$refs.newOwnRef.handleClear()
-        this.$refs.newOwnRef.handleDataInit()
-      }
+      this.$refs.newOwnRef.handleClear()
+      this.$refs.newOwnRef.handleDataInit()
     },
     handleClearShell() {
       this.listQuery.shellId = null
       this.shellList = []
-      if (this.$refs.shellIdRef) {
-        this.$refs.shellIdRef.handleClear()
-        this.$refs.shellIdRef.handleDataInit()
-      }
+      this.$refs.shellIdRef.handleClear()
+      this.$refs.shellIdRef.handleDataInit()
     },
     handleClose() {
       this.handleDataInit()

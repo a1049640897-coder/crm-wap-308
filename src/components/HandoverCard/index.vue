@@ -30,7 +30,7 @@
 
         <!-- 2 联系方式 -->
         <div class="student-info-item" v-if="studentData.mobileNumber || studentData.wxNumber || studentData.qqNumber">
-          <div class="info-item" v-if="studentData.mobileNumber">
+          <div class="info-item">
             <img src="@/assets/images/icons/mobile.png" alt="" class="info-img">
             <a @click.stop="handlePhone" :href="`tel: ${studentData.mobileNumber}`">{{studentData.mobileNumber || '-' }}</a>
           </div>
@@ -218,11 +218,11 @@ export default {
       return [val1, val2, val3].filter(item => item).join('/')
     }
   },
-  /* activated() {
+  activated() {
     if (this.jumoStudentId) {
       this.handleUpdataInfo()
     }
-  }, */
+  },
   mounted() {
     if (this.typeTab === 'MyReceive' && this.studentData.secondsDown) {
       this.receiveObj = dateCountDown(this.studentData.secondsDown)
@@ -328,6 +328,9 @@ export default {
       if (!obj) return ''
       return obj.text
     },
+    handleRotate() {
+      this.isRotate = !this.isRotate
+    },
 
     handlePopSelect(e) {
       const { text } = e
@@ -341,8 +344,33 @@ export default {
     handlePhone() {
     },
 
+    handleGetSea() {
+      if ([1, 3].includes(this.roleFlag)) {
+        this.$fm('只有咨询或教务才可领取')
+        return
+      }
+      this.isGetConsultSeaShow = true
+    },
+
+    handleStudentInfo() {
+      if (this.isDetail || this.showPopover) return
+      this.jumoStudentId = this.sId
+      this.$router.push(`/studentinfo/${this.sId}/null`)
+    },
+
+    handleAddConsulResult() {
+      this.isConsultSubscribeResultShow = true
+    },
+
+    handleEditStudentInfo() {
+      this.jumoStudentId = this.sId
+      this.$router.push({
+        path: `/studentinfoedit/${this.sId}`
+      })
+    },
+
     handleUpdataInfo() {
-      consultationInfoApi(this.sId, Number(this.listType)).then(res => {
+      consultationInfoApi(this.sId).then(res => {
         let info = res.data
         if (this.listType === 'yuYueZiXun') {
           info.id = this.studentData.id

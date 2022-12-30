@@ -3,10 +3,10 @@
     <div class="student-base">
       <div class="student-header common-list-contain">
         <div class="SH-l">
-          <div class="SH-name">{{studentData.title}}</div>
           <div class="SH-tags">
             <span class="SH-tag" :class="studentData.state == 1 ? 'SH-tag-green':  studentData.state == 2 ? 'SH-tag-blue' : 'SH-tag-gray'" v-if="studentData.state">{{studentData.state == 1 ? '未开始' :studentData.state == 2 ? '进行中' : '已结束' }}</span>
           </div>
+          <div class="SH-name">{{studentData.title}}</div>
         </div>
         <div class="SH-e" @click="handleEdit(studentData)" v-permission=" counselTab == 'LectureReg'  ?  'MARKET:SCHOOL:LECTURE_EDIT' : 'MARKET:BOOK:EDIT'">
           <img class="SH-r-icon" src="@/assets/images/icons/recordEdit.png" alt="">
@@ -261,15 +261,61 @@ export default {
       this.isRotate = !this.isRotate
     },
 
+    handlePopSelect(e) {
+      if (e.dialogName === 'isConsultSubscribeShow') {
+        if (this.studentData.state === 3) {
+          this.$fm('已完成预约！')
+          return
+        }
+      } else if (e.dialogName === 'editStudent') {
+        this.showPopover = false
+        return
+      } else if (e.dialogName === 'addCounselRecord') {
+        this.showPopover = false
+        this.$nextTick(() => {
+          this.handleConsulRecord()
+        })
+        return
+      }
+      this.reserveConsultId = this.studentData.reserveConsultId
+      this[e.dialogName] = true
+    },
+
     handlePhone() {
+    },
+
+    handleGetSea() {
+      if ([1, 3].includes(this.roleFlag)) {
+        this.$fm('只有咨询或教务才可领取')
+        return
+      }
+      this.isGetConsultSeaShow = true
     },
 
     handleNoFollow() {
       this.$emit('noFollowRefresh')
     },
 
+    handleAddConsulResult() {
+      this.isConsultSubscribeResultShow = true
+    },
+
+    handleConsulRecord() {
+      this.jumoStudentId = this.sId
+      this.$router.push({
+        path: `/counselrecord/${this.sId}/null`
+      })
+    },
+
+    handleEditStudentInfo() {
+      this.jumoStudentId = this.sId
+      this.$router.push({
+        path: `/studentinfoedit/${this.sId}/null`
+      })
+    },
+
     handleUpdataInfo() {
-      consultationInfoApi(this.sId, Number(this.listType)).then(res => {
+      consultationInfoApi(this.sId).then(res => {
         this.$emit('onUpdataInfo', res.data)
         this.jumoStudentId = null
       }).catch(() => {

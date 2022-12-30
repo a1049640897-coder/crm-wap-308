@@ -1,6 +1,6 @@
 <template>
   <div>
-    <HeaderFilter :listType="listType" @onListQuery="handleListQuery" ref="headerFilter" :paramProp="listQuery.lecture" :moreActLecture="moreActLecture" />
+    <HeaderFilter :listType="listType" @onListQuery="handleListQuery" :paramProp="listQuery.lecture" />
     <LectureCount :listType="listType" :countLoading.sync="countLoading" :countData="countData" v-if="listType!=='4'" />
     <RMList :moreLoading.sync="moreLoading" :refreshing.sync="refreshing" :finished.sync="finished" @onLoad="handleLoad" @onRefresh="handleRefresh" isMore :tableList="tableList">
       <div>
@@ -72,12 +72,10 @@ export default {
           distributeType: null, // 今日活动类型筛选
           nowActivityshellId: null,// 今日活动部门筛选
           sendBookType: null, //讲课/活动类型
-          demo: 1
         }
       },
       isClearCache: false,
-      shareCodeIsOpen: false,
-      moreActLecture: {}
+      shareCodeIsOpen: false
     }
   },
   computed: {
@@ -86,7 +84,6 @@ export default {
       quesConnectObj: state => state.activity.quesConnectObj,
       quesConnectObjIsUpdate: state => state.activity.quesConnectObjIsUpdate,
       activityId: state => state.common.global.activityId,
-      nowAuthDepartList: state => state.common.user.nowAuthDepartList,
     })
   },
   activated() {
@@ -95,29 +92,11 @@ export default {
   deactivated() {
     window.removeEventListener('scroll', this.handleScroll)
   },
-  // created() {
-  //   // this.handleInit()
-  //   // this.handleScrollInit()
-  //   // if(Array.isArray(this.nowAuthDepartList) && this.nowAuthDepartList.length){
-  //   //   this.listQuery.lecture.nowActivityshellId = this.nowAuthDepartList[0].value
-  //   // }
-  // },
-  mounted() {
-    this.handleSetNoWDept()
+  created() {
     this.handleInit()
     this.handleScrollInit()
   },
   methods: {
-    handleSetNoWDept() {
-      if (this.nowAuthDepartList && this.nowAuthDepartList.length) {
-        this.$set(this.listQuery.lecture, 'nowActivityshellId', this.nowAuthDepartList[0].value)
-        this.$nextTick(() => {
-          setTimeout(() => {
-            this.$refs.headerFilter.handleSetNoWDept(this.nowAuthDepartList[0].value, this.nowAuthDepartList[0].text)
-          })
-        })
-      }
-    },
     resetSingleList() {
       getActiveListDetail(this.activityId, this.listType == 4 ? 4 : this.counselTab == 'LectureReg' ? 1 : this.counselTab == 'MarketAct' ? 3 : 2).then(res => {
         if (this.tableList.find(v => v.id == res.data.id)) {
@@ -178,7 +157,6 @@ export default {
       this.getTableList('init')
     },
 
-
     getTableList(val) {
       const { shellIdsLocal, collegeInfoIdLocal, startDate, endDate, keyword, type, method, targets, usePersonId, teacherIds, chargePersonIds } = this.listQuery.lecture
       const query = {
@@ -198,10 +176,9 @@ export default {
           targets: targets,
           usePersonId: usePersonId,
           teacherIds: teacherIds ? [teacherIds] : [],
-          chargePersonIds: chargePersonIds ? [chargePersonIds] : [],
+          chargePersonIds: chargePersonIds ? [chargePersonIds] : []
         }
       }
-      this.moreActLecture = query.lecture
       let nowQuery = {
         type: query.lecture.distributeType,
         branchId: query.lecture.nowActivityshellId

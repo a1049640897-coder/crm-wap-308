@@ -10,7 +10,7 @@
       <van-field v-model="listQuery.content" clear-trigger="always" clearable input-align="right" rows="3" autosize type="textarea" label="咨询内容" placeholder="请输入" />
       <van-field clearable label="上传图片">
         <template #input>
-          <van-uploader v-model="fileList" :max-count="9" :before-read="handleFileBeforeRead" :before-delete="handleDeleteFile" :max-size="5120 * 1024" @oversize="onOversize" />
+          <van-uploader v-model="fileList" :max-count="9" :before-read="handleFileBeforeRead" :before-delete="handleDeleteFile" />
         </template>
       </van-field>
       <van-field readonly name="calendar" input-align="right" :required="isRequireNextVisit" :value="listQuery.nextConsultTime" :rules="[{ required: isRequireNextVisit, message: '请选择下次回访' }]" label="下次回访" placeholder="请选择" @click="showCalendar = true">
@@ -31,14 +31,14 @@
         <van-field v-model.trim="studentInfo.name" name="name" required clear-trigger="always" clearable input-align="right" label="学生姓名" maxlength="50" placeholder="请输入" :rules="[
           { required: true, message: '请输入学生姓名' }
         ]" />
-        <van-field v-model="studentInfo.mobile" :disabled="!studentInfo.enable" clear-trigger="always" :rules="[{ validator: VerifyFunc.poPhone, message: '请输入' }]" @change="verityHasUser" maxlength="11" name="mobile" :clearable="studentInfo.enable" input-align="right" type="tel" label="手机号码" placeholder="请输入" />
-        <van-field v-model="studentInfo.qqNumber" :disabled="!studentInfo.enable" clear-trigger="always" :rules="[{ validator: VerifyFunc.qq, message: '请输入' }]" @change="verityHasUser" maxlength="50" name="qqNumber" :clearable="studentInfo.enable" input-align="right" type="tel" label="QQ" placeholder="请输入" />
-        <van-field v-model="studentInfo.wxNumber" :disabled="!studentInfo.enable" clear-trigger="always" :rules="[{ validator: VerifyFunc.wx, message: '请输入' }]" @change="verityHasUser" maxlength="50" name="wxNumber" :clearable="studentInfo.enable" input-align="right" label="微信" placeholder="请输入" />
+        <van-field v-model="studentInfo.mobile" clear-trigger="always" :rules="[{ validator: VerifyFunc.poPhone, message: '请输入' }]" @blur="verityHasUser" maxlength="11" name="mobile" clearable input-align="right" type="tel" label="手机号码" placeholder="请输入" />
+        <van-field v-model="studentInfo.qqNumber" clear-trigger="always" :rules="[{ validator: VerifyFunc.qq, message: '请输入' }]" @blur="verityHasUser" maxlength="50" name="qqNumber" clearable input-align="right" type="tel" label="QQ" placeholder="请输入" />
+        <van-field v-model="studentInfo.wxNumber" clear-trigger="always" :rules="[{ validator: VerifyFunc.wx, message: '请输入' }]" @blur="verityHasUser" maxlength="50" name="wxNumber" clearable input-align="right" label="微信" placeholder="请输入" />
         <ReYear v-model="studentInfo.graduationYear" name="graduationYear" clearable :isRequrie="[47].includes(currentSystemId) ? true : isRequireYear" title="毕业年份" label="毕业年份" />
         <ReYear v-model="studentInfo.examYear" name="examYear" clearable :isRequrie="[47].includes(currentSystemId)" :title="examYearText" :label="examYearText" />
         <RePick v-model="studentInfo.attributeId" label="院校属性" :list="schoolTypeList" @change="handleSchoolType" name="attributeId" :isRequrie="isRequireSchoolId" isCell clearable />
-        <RePick v-model="studentInfo.schoolValue" label="就读学校" :list.sync="schoolList" @change="handleSchool" v-if="studentInfo.attributeId !== -1" isShowSearch isOriginSchool :originSchoolAttr="studentInfo.attributeId" name="schoolValue" originSchoolType="1" :isRequrie="isRequireSchoolId" isCell clearable />
-        <RePick v-model="studentInfo.majorValue" label="就读专业" :list.sync="professionList" v-if="studentInfo.attributeId !== -1" isShowSearch isOriginSchool :originSchoolAttr="studentInfo.schoolValue" name="majorValue" originSchoolType="2" :isRequrie="[1].includes(currentSystemId)" isCell clearable />
+        <RePick v-model="studentInfo.schoolValue" label="就读学校" :list.sync="schoolList" @change="handleSchool" isShowSearch isOriginSchool :originSchoolAttr="studentInfo.attributeId" name="schoolValue" originSchoolType="1" :isRequrie="isRequireSchoolId" isCell clearable />
+        <RePick v-model="studentInfo.majorValue" label="就读专业" :list.sync="professionList" isShowSearch isOriginSchool :originSchoolAttr="studentInfo.schoolValue" name="majorValue" originSchoolType="2" :isRequrie="[1].includes(currentSystemId)" isCell clearable />
         <RePick v-model="studentInfo.cityClassList" label="所在城市" :list="allProvicesAndCitys" isShowSearch isCascader name="cityClassList" titleKey="text" isCell clearable isCascaderAllLevelName />
       </div>
       <!-- <RePick v-model="studentInfo.graduationYear" label="毕业年份" :list="graduationList" titleKey="text" idKey="value" isCell clearable /> -->
@@ -53,10 +53,9 @@
 </template>
 
 <script>
-import { departmentSeaApi } from '@/api/potentialGuest/consultation'
-import { detailClientApi, intentionTypeListApi, shellCoursePacketListApi, verifyUserApi, editClient, addConsultRecord, editConsultRecord, uploadRecordFile, getConsultRecordDetailApi, delRecordFile, deleteRecordApi } from '@/api/potentialGuest/counselRecord'
+import { departmentApi, detailClientApi, intentionTypeListApi, shellCoursePacketListApi, verifyUserApi, editClient, addConsultRecord, editConsultRecord, uploadRecordFile, getConsultRecordDetailApi, delRecordFile, deleteRecordApi } from '@/api/potentialGuest/counselRecord'
 import { getDemandType, infoSetApi } from '@/api/common'
-import { debounceFun, commonSchoolInfohandle } from '@/utils'
+import { commonSchoolInfohandle } from '@/utils'
 import VerifyFunc from '@/utils/verify'
 import { mapState } from 'vuex'
 import { Dialog } from 'vant'
@@ -160,7 +159,6 @@ export default {
   created() {
     let sId = Number(this.$route.params.sid)
     let eId = Number(this.$route.params.eid)
-    document.title = eId ? '编辑咨询记录' : '添加咨询记录'
     let reserveId = Number(this.$route.query.reserveId)
     if (!Number.isNaN(sId)) { this.sId = sId }
     if (!Number.isNaN(eId)) { this.eId = eId }
@@ -173,7 +171,7 @@ export default {
   methods: {
     handleInit() {
       this.listQuery.crmPotentialStudentId = this.sId
-      this.listQuery.reserveId = this.$route.query.reserveId ? Number(this.$route.query.reserveId) : this.reserveId
+      this.listQuery.reserveId = this.reserveId
       if (this.sId) {
         this.handleDetail()
       }
@@ -181,9 +179,7 @@ export default {
         this.handleCounselDetail()
       }
     },
-    onOversize() {
-      return this.$fm('图片大小不能超过 5M')
-    },
+
     handleExpend() {
       this.isExpend = !this.isExpend
     },
@@ -266,7 +262,7 @@ export default {
       })
     },
     handleApiInit() {
-      departmentSeaApi(this.studentInfo.branchId).then(res => {
+      departmentApi(this.studentInfo.branchId).then(res => {
         this.departList = res.data || []
         if (this.departList.length === 1 && !this.eId) {
           this.listQuery.sysShellId = this.departList[0].value
@@ -333,7 +329,8 @@ export default {
     handleGraduateClear() {
       this.studentInfo.graduationYear = ''
     },
-    verityHasUser: debounceFun(function () { // 校验学生是否重复（手机、微信、QQ有修改时才调接口判断）
+    verityHasUser() {
+      // 校验学生是否重复（手机、微信、QQ有修改时才调接口判断）
       if (this.loading) return
       const { mobile, wxNumber, qqNumber } = this.studentInfo
       let newMobile, newQQ, newWx;
@@ -373,7 +370,7 @@ export default {
       } else {
         this.isHasUser = false
       }
-    }, 300, false),
+    },
     handleConfirm() {
       if (this.loading) return
       this.$refs.recordForm.validate().then(() => {
@@ -392,7 +389,6 @@ export default {
         const objs = { extend: { ...this.studentInfo.extend }, entity: { ...this.studentInfo } }
         delete objs.entity.extend
         if (objs.entity.attributeId === -1) {
-
           objs.entity.schoolSaveId = null
         }
         if (objs.entity.majorValue && objs.entity.majorValue !== -1) {
@@ -404,6 +400,7 @@ export default {
         if (objs.entity.attendSchool === -1) {
           objs.entity.attendSchool = null
         }
+
         editClient(objs).then(res => {
           if (res.status === 200) {
             this.saveRecord()
@@ -435,7 +432,7 @@ export default {
                 reject(false)
                 done()
               }
-
+  
             }
           })
         } else {
@@ -527,13 +524,9 @@ export default {
       })
     },
     handleBack(num = -1) {
-      // setTimeout(() => {
-      if (this.$route.query.isComeFrom === 'actPart') {
-        this.$router.go(-2)
-      } else {
+      setTimeout(() => {
         this.$router.go(num)
-      }
-      // }, 2000);
+      }, 2000);
     }
   }
 }

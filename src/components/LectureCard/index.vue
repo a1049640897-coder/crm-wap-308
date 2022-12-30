@@ -3,10 +3,9 @@
     <div class="student-base">
       <div class="student-header">
         <div class="SH-l">
-          <span class="SH-name" v-if="listType ==3 ">{{studentData.abbreviation}} {{studentData.title}}</span>
-          <span class="SH-name" v-else> {{studentData.title}}</span>
           <span class="SH-tag" :class="studentData.state == 1 ? 'SH-tag-green':  studentData.state == 2 ? 'SH-tag-blue' : 'SH-tag-gray'" v-if="studentData.state">{{studentData.state == 1 ? '未开始' :studentData.state == 2 ? '进行中' : '已结束' }}</span>
           <span class="SH-tag SH-tag-blue" v-else-if="studentData.opponent">{{studentData.opponent}}</span>
+          <span class="SH-name">{{studentData.title}}</span>
         </div>
         <div class="SH-r">
           <div class="SH-r-icon" v-if="listType == 3" v-permission="'MARKET:OPPONENT:EDIT'">
@@ -24,11 +23,11 @@
       <div class="student-subtitle" :class="studentData.state == 1 ? 'subtitle-green':  studentData.state == 2 ? 'subtitle-blue' : 'subtitle-gray'">
         <span>{{studentData.dateStr}}</span><span v-if="listType != 2">{{studentData.method == 2 ? '面授' : '网授'}}</span><span v-if="listType != 2">{{studentData.teachers}}主讲</span>
       </div>
+
       <div class="student-extraInfo">
         <span class="extra-info-item" v-if="listType == 3 && studentData.attendance">到场{{studentData.attendance}}人<div class="extra-info-item-line"></div> </span>
-        <span class="extra-info-item" v-if="listType != 3 && (studentData.chargePersonName || studentData.chargePerson)">{{studentData.chargePersonName || studentData.chargePerson}}负责<div class="extra-info-item-line"></div> </span>
+        <span class="extra-info-item" v-if="listType != 3 && studentData.chargePersonName">{{studentData.chargePersonName}} 负责<div class="extra-info-item-line"></div> </span>
         <span class="extra-info-item" v-if="studentData.commonSchoolInfo">{{studentData.commonSchoolInfo[2]}} <div class="extra-info-item-line"></div> </span>
-        <span class="extra-info-item" v-if="studentData.sendBookType">{{studentData.sendBookType}} <div class="extra-info-item-line"></div> </span>
         <span class="extra-info-item" v-if="studentData.type">{{studentData.type}}<div class="extra-info-item-line"></div> </span>
         <span class="extra-info-item" v-if="studentData.targets">{{studentData.targets}}<div class="extra-info-item-line"></div> </span>
       </div>
@@ -48,6 +47,7 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
+import { consultationInfoApi } from '@/api/potentialGuest/consultation'
 
 export default {
   props: {
@@ -128,7 +128,6 @@ export default {
   },
   activated() {
     this.operatShow = false
-    this.showPopover = false
   },
   mounted() {
     this.$emit('onStudentCardMounted')
@@ -140,9 +139,6 @@ export default {
     }),
   },
   methods: {
-    handleCloseSelect() {
-      console.log('关闭了...');
-    },
     filterCounselTab() {
       if (this.studentData.activityType) {
         return this.studentData.activityType == 1 ? 'LectureReg' : 'MarketAct'
@@ -217,8 +213,6 @@ export default {
           this.operatShow = false
           // 跳转..
           this.$router.push(`/QuesConnect/${this.studentData.id}`)
-          // 设置sessionStore来判断是否从关联问卷或者重新关联进入
-          sessionStorage.setItem('counselTab', this.counselTab)
         })
       }
 
@@ -253,6 +247,16 @@ export default {
       let newCounselTab = this.studentData.activityType == 1 ? 'LectureReg' : this.studentData.activityType == 3 ? 'MarketAct' : null
       let newListType = this.studentData.activityType == 1 ? 1 : this.studentData.activityType == 3 ? 2 : null
       this.$router.push(`/lectureDetails/${this.sId}/${newListType ? newListType : this.listType}/${newCounselTab ? newCounselTab : this.counselTab}`)
+    },
+
+
+    handleUpdataInfo() {
+      consultationInfoApi(this.sId).then(res => {
+        this.$emit('onUpdataInfo', res.data)
+        this.jumoStudentId = null
+      }).catch(() => {
+        this.jumoStudentId = null
+      })
     },
 
     handleSetActivityId(activityId) {

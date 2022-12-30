@@ -87,8 +87,7 @@ $S-color: #0088fe;
 
     .student-info {
       .student-info-item {
-        line-height: 1.6rem;
-
+        margin-bottom: 0.5rem;
         .info-item {
           display: inline-block;
           position: relative;
@@ -100,7 +99,7 @@ $S-color: #0088fe;
             position: absolute;
             content: '';
             width: 0.5px;
-            height: 50%;
+            height: 85%;
             background: #999999;
             margin: 0 0.5rem;
             transform: translate(-50%, -50%);
@@ -175,15 +174,6 @@ $S-color: #0088fe;
         .van-button__text,
         .van-popover__wrapper {
           width: 100%;
-        }
-
-        /deep/.van-button::before {
-          background-color: transparent !important;
-          border-color: transparent !important;
-        }
-
-        /deep/.van-button::before {
-          background-color: #fff !important;
         }
 
         img {

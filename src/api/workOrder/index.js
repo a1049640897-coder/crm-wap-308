@@ -16,6 +16,7 @@ export function userCommonmenuListApi() {
 }
 // 获取菜单列表
 export async function userSysCommonmenuListApi(systemId = null) {
+  console.log(systemId,'systemIdsystemIdsystemIdsystemId');
   return request('/system/userCommon/menu', {
     method: 'get',
     headers: systemId ? { 'reqCurrentSysId': systemId } : null

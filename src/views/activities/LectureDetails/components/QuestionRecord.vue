@@ -107,10 +107,11 @@ export default {
       }
     },
     handleToConnect() {
-      // 设置进入关联问卷的标识符
-      sessionStorage.setItem('counselTab', this.counselTab)
       this.$router.push({
         path: `/QuesConnect/${this.sId}`,
+        // query: {
+        //   counselTab: this.counselTab
+        // }
       })
     },
     handleShowCode() {
@@ -135,7 +136,7 @@ export default {
         }
         // 获取头部标题信息
         activityQuesDetailApi(this.sId).then(res => {
-          res.data.questionnaireId ? activityQuesHeaderApi(res.data.questionnaireId, this.sId).then(headerRes => {
+          res.data.questionnaireId ? activityQuesHeaderApi(res.data.questionnaireId).then(headerRes => {
             this.headerTitle = headerRes.data.title
           }) : this.headerTitle = null
 

@@ -36,13 +36,13 @@ export default {
   watch: {
     isOpen(val) {
       this.isDialog = val
-      if (val) {
-        this.getRelevanceOptions()
-      }
     },
     isDialog(val) {
       this.$emit('update:isOpen', val)
     }
+  },
+  created() {
+    this.getRelevanceOptions()
   },
   methods: {
     getRelevanceOptions() {

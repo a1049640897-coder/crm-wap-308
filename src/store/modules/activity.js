@@ -173,8 +173,6 @@ export default {
     quesConnectObjIsUpdate: false, // 关联问卷成功活动是否刷新
     activityIsAddUpdate: false, // 添加活动列表是否刷新
     isDetailsEnter: false, // 是否是详情进入编辑
-    activityPartId: null, // 参与人员id
-    activityPartIsUpdate: false, // 参与人员列表是否重新刷新
   },
   mutations: {
     SET_QUERYLIST(state, queryList) {
@@ -238,27 +236,12 @@ export default {
       const { quesConnectObjIsUpdate } = payload
       state.quesConnectObjIsUpdate = quesConnectObjIsUpdate
       state.quesConnectObj = payload
-      console.log('二维码关联的对象...', payload);
     },
 
     // 设置从详情进入编辑
     SET_DETAILFLAG(state, payload) {
       const { flag } = payload
       state.isDetailsEnter = flag
-    },
-
-    // 设置参与人员id
-    SET_PARTACTID(state, payload) {
-      const { activityPartId } = payload
-      console.log('activityPartId...', activityPartId);
-      state.activityPartId = activityPartId
-    },
-
-    // 设置参与人员刷新
-    SET_PARTUSERUPDATE(state, payload) {
-      const { activityPartIsUpdate } = payload
-      console.log('activityPartIsUpdate...', activityPartIsUpdate);
-      state.activityPartIsUpdate = activityPartIsUpdate
     }
   },
   actions: {

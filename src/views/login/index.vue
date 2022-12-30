@@ -17,7 +17,7 @@
           </div>
           <div style="padding: 0.3rem 0 0.6rem 0; border-bottom: 1px solid #ddd;">
             <div class="password">系统：</div>
-            <RePick v-model="loginForm.systemId" :list="devSystemList" @changeAll="handleSystem" isUseSlot clearable isShowSearch>
+            <RePick v-model="loginForm.systemId" :list="devSystemList" @changeAll="handleSystem" isUseSlot clearable>
               <div class="flex sbt flex-c-center">
                 <div>
                   <span v-if="loginForm.systemId">{{loginForm.systemTitle}}</span>

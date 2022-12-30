@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ParticipantFilter :listType="listType" :moreActLecture="moreActLecture" :paramProp="listConditonObj" :listQueryParam="listQuery.param" @onListQuery="handleListQuery" v-if="firstList.length" />
+    <ParticipantFilter :listType="listType" :paramProp="listConditonObj" :listQueryParam="listQuery.param" @onListQuery="handleListQuery" v-if="firstList.length" />
     <div class="count-cont" v-if="firstList.length">
       <div class="count-list">
         <van-loading v-if="cloading" size="0.6rem" style="margin-bottom:0.4rem" />
@@ -17,7 +17,7 @@
     </div>
     <RMList v-if="tableList.length" :moreLoading.sync="moreLoading" :refreshing.sync="refreshing" :finished.sync="finished" @onLoad="handleLoad" @onRefresh="handleRefresh" isMore :tableList="tableList">
       <div>
-        <StudentCard :isFreshs="listConditonObj.isFreshs" v-for="(item, index) in tableList" :key="item.id" :sId="item.id" :studentData="item" @onUpdataInfo="handleUpdataInfo($event, item, index)" :listType="'9'" />
+        <StudentCard v-for="(item, index) in tableList" :key="item.id" :sId="item.id" :studentData="item" @onUpdataInfo="handleUpdataInfo($event, item, index)" :listType="'9'" />
       </div>
     </RMList>
     <div class="common-empty" v-else style="background: #ffffff;">
@@ -34,28 +34,15 @@
 </template>
 <script>
 import { postPartStudentListApi, postPartStudentCountApi, postPartStudentConditonApi } from '@/api/potentialGuest/activity'
-import { mapState } from 'vuex'
-import { getScrollTop } from '@/utils'
 // 参与人员
 export default {
   props: {
-    counselTab: String,
-    onlyReadObj: {
-      type: Object,
-      default() {
-        return {}
-      }
-    }
+    counselTab: String
   },
   components: {
     ParticipantFilter: () => import('./ParticipantFilter'),
     RMList: () => import('@/components/ReComponents/RMList'),
     StudentCard: () => import('@/components/StudentCard')
-  },
-  computed: {
-    ...mapState({
-      pageSize: state => state.common.setting.pageSize,
-    })
   },
   data() {
     return {
@@ -67,24 +54,14 @@ export default {
       listConditonObj: {},
       listQuery: {
         pageinfo: { pageNum: 1, pageSize: 20, sort: [{ column: 'addTime', type: 1 }] },
-        param: {
-          type: 3, countFilter: 1, sysShellId: [], activityId: [],
-          startDate: null, endDate: null, keyword: null, consultantName: [],
-          intentionType: [], intentionClass: [], sex: [], courseAttribute: [],
-          owner: [], schoolManager: [], followState: [], ids: [],
-          crmMarketAreaIds: [],
-          isFresh: null, attendSchools: [], consultState: null, cityId: null
-        }
+        param: { type: 3, countFilter: 1, sysShellId: [], activityId: [], startDate: null, endDate: null, keyword: null, consultantName: [], intentionType: [], intentionClass: [], sex: [], courseAttribute: [], owner: null, schoolManager: [], followState: [], ids: [], isFresh: null, attendSchools: [], consultState: null, cityId: null }
       },
       sId: null,
       countObj: { 1: 0, 6: 0, 7: 0 },
       listType: '1',
-      firstList: [],
-      height: 0,
-      moreActLecture: {}
+      firstList: []
     }
   },
-
   created() {
     let sId = Number(this.$route.params.sid)
     if (!Number.isNaN(sId)) { this.sId = sId }
@@ -92,56 +69,8 @@ export default {
     this.listType = (listType == 2 ? 3 : 1).toString()
     this.listQuery.param.type = this.listType
     this.handleInit('firstRequest')
-    this.handleScrollInit()
   },
-
-  activated() {
-    console.log(5555555556, this.height);
-    this.handleScrollInit()
-  },
-
-
   methods: {
-    handleScrollToTop() {
-      window.scrollTo(0, 0)
-      this.height = 0
-    },
-
-    handleScrollInit() {
-      window.addEventListener('scroll', this.handleScroll)
-      window.scrollTo(0, this.height)
-    },
-    handleScroll() {
-      getScrollTop().then(height => {
-        this.height = height + 500
-      })
-    },
-
-    reSetSingleList(id) {
-      let listQuery = JSON.parse(JSON.stringify(this.listQuery))
-      listQuery.param.id = id
-      this.$loading(true, 'partLoading')
-      postPartStudentListApi(listQuery).then(res => {
-        if (res.data && res.data.length) {
-          if (this.tableList.find(v => v.id == res.data[0].id)) {
-            let index = this.tableList.findIndex(v => v.id == res.data[0].id)
-            this.$set(this.tableList, index, res.data[0])
-            this.handleSetBranchId()
-            this.$loading(false, 'partLoading')
-          } else {
-            this.$loading(false, 'partLoading')
-          }
-        } else {
-          this.$loading(false, 'partLoading')
-        }
-      }).catch(() => {
-        this.$loading(false, 'partLoading')
-      })
-    },
-    handleUpdataInfo(id) {
-      console.log('handleUpdataInfo', id);
-      this.reSetSingleList(id)
-    },
     checkPermissionStatus(counselTab) {
       if (counselTab == 'LectureReg') {
         return 'MARKET:SCHOOL:PARTICIPANT_ENTER'
@@ -163,11 +92,7 @@ export default {
     },
     handleAddStudent() {
       this.$router.push({
-        path: `/studentinfoedit/null`,
-        query: {
-          sid: this.$route.params.sid,
-          onlyReadObj: this.onlyReadObj
-        }
+        path: `/studentinfoedit/null`
       })
     },
     handleInit(val) {
@@ -178,23 +103,25 @@ export default {
       this.getTableList('init', val)
     },
     handleListQuery(paramProp) {
-      this.listQuery.pageinfo.sort = paramProp.sortRule ? [{ ...paramProp.sortRule }] : [{ type: 1, column: 'addTime' }],
-        this.listQuery.param = {
-          ...this.listQuery.param,
-          ...paramProp,
-          type: this.listType == 1 ? 1 : 3, //  listType: 1 讲座登记 其他: 营销活动
-          attendSchools: paramProp.schoolIdLocal ? [paramProp.schoolIdLocal] : [], // 就读学校
-          years: paramProp.graduationYearLocal ? [paramProp.graduationYearLocal] : [], // 毕业年份
-          examYears: paramProp.examYearLocal ? [paramProp.examYearLocal] : [], // 考试年份
-          schoolManager: paramProp.campusLocal ? [paramProp.campusLocal] : [], // 市场区域负责人
-          owner: paramProp.ownLocal ? [paramProp.ownLocal] : [], // 所属人
-
-          // intentionType: paramProp.intentionType ? [paramProp.intentionType] : [], // 意向类型
-          result: (paramProp.result && paramProp.result !== 5) ? [paramProp.result] : [], // 咨询结果
-          followUpState: paramProp.followUpState == 5 ? null : paramProp.followUpState, // 跟进状态
-          consultState: paramProp.consultState == 5 ? null : paramProp.consultState, // 预约状态
-
-        }
+      this.listQuery.pageinfo.sort = paramProp.sortRule ? [{ ...paramProp.sortRule }] : []
+      this.listQuery.param = {
+        ...this.listQuery.param,
+        ...paramProp,
+        type: this.listType == 1 ? 1 : 3,
+        // intentionType: paramProp.intentionType ? [paramProp.intentionType] : [], // 意向类型
+        result: paramProp.result ? paramProp.result == 5 ? [] : [paramProp.result] : [], // 咨询结果
+        followUpState: paramProp.followUpState == 5 ? null : paramProp.followUpState, // 跟进状态
+        consultState: paramProp.consultState == 5 ? null : paramProp.consultState, // 预约状态
+        intentionClass: paramProp.intentionClass ? [...paramProp.intentionClass] : [], // 意向班型
+        cityId: paramProp.cityId, // 所在城市
+        examYear: paramProp.examYear ? [...paramProp.examYear] : [], // 市场区域
+        isFresh: paramProp.isFreshLocal, // 属性
+        schoolManager: paramProp.campusLocal ? [...paramProp.campusLocal] : [], // 市场区域负责人
+        owner: paramProp.ownLocal ? [...paramProp.ownLocal] : [], // 所属人
+        crmMarketAreaIds: paramProp.areaId ? [...paramProp.areaId] : [], // 市场区域
+        years: paramProp.graduationYearLocal ? [paramProp.graduationYearLocal] : [], // 毕业年份
+        examYears: paramProp.examYears ? [...paramProp.examYears] : [] // 考试年份
+      }
       this.finished = false
       this.handleRefresh()
     },
@@ -212,21 +139,8 @@ export default {
           id: 5,
           text: '全部'
         })
-        this.listConditonObj.isFreshs = this.listConditonObj.isFreshs.map(v => {
-          return {
-            text: v.text,
-            value: (v.value || v.value == 0) && v.value.toString()
-          }
-        })
       })
     },
-
-    handleSetBranchId() {
-      this.tableList.forEach(v => {
-        this.$set(v, 'branchId', v.sysShellId)
-      })
-    },
-
     getTableList(val, type) {
       this.moreLoading = true
       this.$loading(true, 'partStudentTableLoading')
@@ -234,23 +148,28 @@ export default {
       const query = {
         pageinfo: {
           ...this.listQuery.pageinfo,
-          pageSize: this.pageSize,
+          pageSize: this.pageSize/* ,
+          sort: [this.listQuery.pageinfo.sort] */
         },
         param: {
           ...this.listQuery.param,
           sysShellId: shellIdsLocal ? [shellIdsLocal] : [], // 部门
           activityId: [this.sId],
+          /* schoolId: schoolIdLocal ? [schoolIdLocal] : [], // 就读学校
+          consultType: consultTypeLocal ? [consultTypeLocal] : [], // 咨询类型
+          examYear: examYearLocal ? [examYearLocal] : [], // 考试年份
+          isFresh: isFreshLocal ? [isFreshLocal] : [], // 属性
+          campus: campusLocal ? [campusLocal] : [], // 市场区域负责人
+          own: ownLocal ? [ownLocal] : [], // 所属人
+          graduationYear: graduationYearLocal ? [graduationYearLocal] : [] // 毕业年份 */
         }
       }
-      this.moreActLecture = query.param
       postPartStudentListApi(query).then(res => {
         if (['init', 'refresh'].includes(val)) {
           this.getListCount()
           this.tableList = res.data || []
-          this.handleSetBranchId()
         } else {
           this.tableList = this.tableList.concat(res.data || [])
-          this.handleSetBranchId()
         }
         if (res.data.length < this.pageSize) {
           this.finished = true
@@ -274,7 +193,6 @@ export default {
       this.listQuery.pageinfo.pageNum = 1
       this.finished = false
       this.getTableList('refresh')
-      this.handleScrollToTop()
     },
     getListCount() {
       this.cloading = true

@@ -110,13 +110,13 @@
         <div class="moreContain-body">
           <RePick v-model="listQuery.schoolIdLocal" label="就读学校" :list.sync="schoolList" isCascader isShowSearch isCell clearable isOriginSchoolSearch />
           <RePick v-model="listQuery.crmMarketAreaIds" label="市场区域" :list="authAreaList" multiple isCell clearable />
-          <ReYear v-model="listQuery.graduationYearLocal" label="毕业年份" :list="years" titleKey="text" idKey="value" isCell clearable />
-          <RePick v-model="listQuery.isFresh" label="属性" :list="paramProp.isFreshs" titleKey="text" idKey="value" isCell clearable />
-          <ReYear v-model="listQuery.examYearLocal" label="考试年份" :list="years" titleKey="text" idKey="value" isCell clearable />
-          <RePick v-model="listQuery.intentionClass" label="意向班型" isShowSearch :list="paramProp.intentionClasss" multiple titleKey="text" idKey="value" isCell clearable />
+          <RePick v-model="listQuery.graduationYearLocal" label="毕业年份" :list="years" titleKey="text" idKey="value" isCell clearable />
+          <RePick v-model="listQuery.isFreshLocal" label="属性" :list="paramProp.isFreshs" titleKey="text" idKey="value" isCell clearable />
+          <RePick v-model="listQuery.examYearLocal" label="考试年份" :list="years" titleKey="text" idKey="value" isCell clearable />
+          <RePick v-model="listQuery.intentionClass" label="意向班型" :list="paramProp.intentionClasss" multiple titleKey="text" idKey="value" isCell clearable />
           <RePick v-model="listQuery.cityId" label="所在城市" :list="allProvicesAndCitys" isShowSearch isCascader name="cityClassList" titleKey="text" isCell clearable isCascaderAllLevelName />
-          <RePick v-model="listQuery.campusLocal" label="市场区域负责人" isShowSearch :list="paramProp.schoolManagers" titleKey="text" idKey="value" isCell clearable />
-          <RePick v-model="listQuery.ownLocal" label="所属人" isShowSearch :list="paramProp.owners" titleKey="text" idKey="value" isCell clearable />
+          <RePick v-model="listQuery.campusLocal" label="市场区域负责人" :list="paramProp.schoolManagers" titleKey="text" idKey="value" isCell clearable />
+          <RePick v-model="listQuery.ownLocal" label="所属人" :list="paramProp.owners" titleKey="text" idKey="value" isCell clearable />
         </div>
         <div class="common-popup-footer">
           <van-button style="width: 8rem; margin-right: 1rem;" @click="handleMoreReset">重置</van-button>
@@ -138,12 +138,11 @@ export default {
     listType: String,
     paramProp: Object,
     listQueryParam: Object,
-    moreActLecture: Object, // 更多选择颜色变化
   },
   components: {
     ReQuickDateBtns: () => import('@/components/ReComponents/ReQuickDateBtns'),
     RePick: () => import('@/components/ReComponents/RePick'),
-    ReYear: () => import('@/components/ReComponents/ReYear')
+    // ReYear: () => import('@/components/ReComponents/ReYear')
   },
   data() {
     return {
@@ -231,21 +230,9 @@ export default {
     }),
     isMoreAct() {
       let bol = false
-      const listQuery = this.moreActLecture || {}
-      const { attendSchools, crmMarketAreaIds, years, examYears, isFresh, intentionClass, schoolManager, owner } = listQuery
-      // const { schoolIdLocal, crmMarketAreaIds, graduationYearLocal, examYearLocal,
-      //  isFresh, intentionClass, campusLocal, ownLocal } = listQuery
-      // if (
-      //   schoolIdLocal || crmMarketAreaIds && crmMarketAreaIds.length || graduationYearLocal || examYearLocal ||
-      //   isFresh || intentionClass && intentionClass.length || campusLocal || ownLocal
-      // ) {
-      //   bol = true
-      // }
-      if (
-        attendSchools && attendSchools.length || crmMarketAreaIds && crmMarketAreaIds.length || years && years.length ||
-        examYears && examYears.length || isFresh || intentionClass && intentionClass.length || schoolManager && schoolManager.length ||
-        owner && owner.length
-      ) {
+      const listQuery = this.listQuery || {}
+      const { shellIdsLocal, collegeInfoIdLocal, teacherIds, chargePersonIds, usePersonId } = listQuery
+      if (shellIdsLocal || collegeInfoIdLocal || teacherIds || chargePersonIds || usePersonId) {
         bol = true
       }
       return bol
@@ -304,6 +291,7 @@ export default {
     //       id: 5,
     //       text: '全部'
     //     })
+    //     console.log('资讯结果..', this.addResOptions);
     //   })
     // },
     onKeywordSearch() {
@@ -324,28 +312,23 @@ export default {
     handleInit() {
       this.defaultDate = null
       this.listQuery = {
-        ...this.listQueryParam,
-        result: Array.isArray(this.listQueryParam.result) && this.listQueryParam.result.length ?
-          this.listQueryParam.result[0] : 5, // 咨询结果
-        consultState: this.listQueryParam.consultState ? this.listQueryParam.consultState : 5,
-        followUpState: this.listQueryParam.followUpState ? this.listQueryParam.followUpState : this.listQueryParam.followUpState == 0 ? 0 : 5,
-
-        schoolIdLocal: this.listQueryParam.attendSchools.length ? this.listQueryParam.attendSchools[0] : null, // 就读学校
-        graduationYearLocal: Array.isArray(this.listQueryParam.years) && this.listQueryParam.years.length ?
-          this.listQueryParam.years[0] : null, // 毕业年份
-        examYearLocal: Array.isArray(this.listQueryParam.examYears) && this.listQueryParam.examYears.length ?
-          this.listQueryParam.examYears[0] : null, // 考试年份
-        campusLocal: this.listQueryParam.schoolManager.length ? this.listQueryParam.schoolManager[0] : null, // 市场区域负责人
-        ownLocal: this.listQueryParam.owner.length ? this.listQueryParam.owner[0] : null, // 所属人
-
-
-        intentionType: this.listQueryParam.intentionType ? [...this.listQueryParam.intentionType] : [],
-
-        // crmMarketAreaIds: this.listQueryParam.areaId ? [...this.listQueryParam.areaId] : [], // 市场区域
+        ...this.listQuery,
+        consultState: this.listQuery.consultState ? this.listQuery.consultState : 5,
+        followUpState: this.listQuery.followUpState ? this.listQuery.followUpState : this.listQuery.followUpState == 0 ? 0 : 5,
+        result: this.listQuery.result ? this.listQuery.result : 5,
+        intentionType: this.listQuery.intentionType ? [...this.listQuery.intentionType] : [],
+        intentionClass: this.listQuery.intentionClass ? [...this.listQuery.intentionClass] : [], // 意向班型
+        cityId: this.listQuery.cityId, // 所在城市
+        examYear: this.listQuery.examYear ? [...this.listQuery.examYear] : [], // 市场区域
+        isFresh: this.listQuery.isFreshLocal, // 属性
+        schoolManager: this.listQuery.campusLocal ? [...this.listQuery.campusLocal] : [], // 市场区域负责人
+        owner: this.listQuery.ownLocal ? [...this.listQuery.ownLocal] : [], // 所属人
+        crmMarketAreaIds: this.listQuery.areaId ? [...this.listQuery.areaId] : [], // 市场区域
+        years: this.listQuery.graduationYearLocal ? [...this.listQuery.graduationYearLocal] : [], // 毕业年份
+        examYears: this.listQuery.examYears ? [...this.listQuery.examYears] : [] // 考试年份
       }
-
-      if (this.listQueryParam.startDate && this.listQueryParam.endDate) {
-        this.defaultDate = [dayjs(this.listQueryParam.startDate).toDate(), dayjs(this.listQueryParam.endDate).toDate()]
+      if (this.listQuery.startDate && this.listQuery.endDate) {
+        this.defaultDate = [dayjs(this.listQuery.startDate).toDate(), dayjs(this.listQuery.endDate).toDate()]
       } else {
         this.handleDateReset()
       }
@@ -401,7 +384,7 @@ export default {
       this.listQuery[name] = !this.listQuery[name]
     },
     handleDateSelect(val) {
-      if (val.filter(item => item).length === 2) {
+      if (val.filter(item => item).length) {
         this.listQuery.startDate = dayjs(val[0]).format('YYYY/MM/DD')
         this.listQuery.endDate = dayjs(val[1]).format('YYYY/MM/DD')
       }
@@ -421,7 +404,6 @@ export default {
       } else if (num === 4) {
         this.listQuery.intentionType = []
       }
-
       // const obj = JSON.parse(JSON.stringify(this.paramProp))
     },
     handleConfirm() {
@@ -443,40 +425,39 @@ export default {
     },
     // 更多重置
     handleMoreReset() {
-      this.listQuery.schoolIdLocal = null // 就读学校
-      this.listQuery.crmMarketAreaIds = [] // 市场区域
-      this.listQuery.graduationYearLocal = null // 毕业年份
-      this.listQuery.examYearLocal = null // 考试年份
-      this.listQuery.isFresh = null // 属性
-      this.listQuery.intentionClass = [] // 意向班型
+      this.listQuery.schoolManager = [] // 校区主管
+      this.listQuery.sysShellId = [] // 所属部门
+      this.listQuery.shellIdsLocal = null
+      this.listQuery.attendSchools = [] // 就读院校
+      this.listQuery.schoolIdLocal = null
       this.listQuery.cityId = null // 所在城市
-      this.listQuery.campusLocal = null // 市场区域负责人
+      this.listQuery.consultState = null // 预约状态
+      this.listQuery.owner = null // 所属人
       this.listQuery.ownLocal = null
-
-      // this.listQuery.schoolManager = [] // 校区主管
-      // this.listQuery.sysShellId = [] // 所属部门
-      // this.listQuery.shellIdsLocal = null
-
-      // this.listQuery.attendSchools = [] // 就读院校
-      // this.listQuery.schoolIdLocal = null
-      // this.listQuery.cityId = null // 所在城市
-      // this.listQuery.consultState = null // 预约状态
-      // this.listQuery.owner = null // 所属人
-      // this.listQuery.ownLocal = null
-      // this.listQuery.sourceId = null
-      // this.listQuery.intentionCourseIds = []
-      // this.listQuery.consultType = []
-      // this.listQuery.consultTypeLocal = null
-      // this.listQuery.examYear = []
-      // this.listQuery.examYearLocal = null
-      // this.listQuery.isFresh = []
-      // this.listQuery.isFreshLocal = null
-      // this.listQuery.campus = []
-      // this.listQuery.campusLocal = null
-      // this.listQuery.areaId = []
-      // this.listQuery.own = []
-      // this.listQuery.graduationYear = []
-      // this.listQuery.graduationYearLocal = null
+      this.listQuery.sourceId = null
+      this.listQuery.intentionClass = [] // 意向班型
+      this.listQuery.intentionCourseIds = []
+      this.listQuery.consultType = []
+      this.listQuery.consultTypeLocal = null
+      this.listQuery.examYear = []
+      this.listQuery.examYearLocal = null
+      this.listQuery.isFresh = []
+      this.listQuery.isFreshLocal = null
+      this.listQuery.campus = []
+      this.listQuery.campusLocal = null
+      this.listQuery.areaId = []
+      this.listQuery.own = []
+      this.listQuery.graduationYear = []
+      this.listQuery.graduationYearLocal = null
+      /* 
+: null
+consultantName: []
+courseAttribute: []
+followState: []
+ids: []
+intentionClass = []
+intentionType: [89]
+isFresh: null */
     },
     handleMoreConfirm() {
       this.$emit('onListQuery', this.listQuery)

@@ -2,7 +2,7 @@
   <div class="student-card common-list-contain">
     <div class="student-base">
       <div class="student-header">
-        <div class="student-header-lf">{{studentData.baseName}} <span v-if="studentData.baseYear">{{studentData.baseYear}}{{studentData.baseYear && '毕业'}}</span></div>
+        <div class="student-header-lf">{{studentData.baseName}} <span>{{studentData.baseYear}}{{studentData.baseYear && '毕业'}}</span></div>
         <div class="student-header-rt" @click="handleShowQus(studentData.id)">已答{{studentData.schedule}}题>></div>
       </div>
 

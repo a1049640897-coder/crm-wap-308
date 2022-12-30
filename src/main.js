@@ -7,17 +7,26 @@ import VConsole from "vconsole"
 import { setLocalStorage, compressFile } from '@/utils'
 import msgAlert from './plugin/msgAlert'
 import pluginPermission from '@/plugin/permission'
+// 全局过滤器
+import * as filters from './filters'
 import 'vant/lib/index.css'
 import 'nprogress/nprogress.css'
+import VueClipboard from 'vue-clipboard2'
 Vue.use(Vant);
 Vue.use(msgAlert)
 Vue.use(pluginPermission)
+Vue.use(VueClipboard)
 if (window.location.href.indexOf('localhost') === -1 && window.location.href.indexOf('www.joineast.com') === -1) {
   new VConsole()
 }
 
 Vue.prototype.$EventBus = new Vue() // 注册全局EventBus
 Vue.prototype.$compressFile = compressFile
+
+// 配置全局过滤器
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 
 new Vue({
   router,

@@ -17,8 +17,8 @@
           </span>
           <span v-else>
             <span>
-              <span v-if="costData.itemsType == '代理'">代理姓名:</span>
-              <span v-if="costData.itemsType == '其他'">成本说明:</span>
+              <span v-if="costData.itemsType == '代理'">代理姓名</span>
+              <span v-if="costData.itemsType == '其他'">成本说明</span>
             </span> {{costData.costDetail}}
           </span>
         </span>
@@ -36,12 +36,13 @@
       </div>
     </div>
     <!-- 成本管理编辑 -->
-    <CostResult :is-open.sync="costIsShow"  :branchId="branchId" :title="'编辑成本'" :costData="costData" :isEdit="true" :sId="sId" @complete="handleUpdataInfo"></CostResult>
+    <CostResult :is-open.sync="costIsShow" :title="'编辑成本'" :costData="costData" :isEdit="true" :sId="sId" @complete="handleUpdataInfo"></CostResult>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import { consultationInfoApi } from '@/api/potentialGuest/consultation'
 
 export default {
   props: {
@@ -66,8 +67,7 @@ export default {
      * yuYueZiXun: 预约咨询
     */
     listType: String,
-    counselTab: String,
-    branchId: [Number, String]
+    counselTab: String
   },
   components: {
     CostResult: () => import('../CostResult/index'),

@@ -14,17 +14,17 @@ $S-color-green: #67C23A;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+
       .SH-l {
         flex: 1;
         display: flex;
         align-items: flex-start;
         margin-bottom: 0.6rem;
-     
+
         .SH-name {
           color: #333333;
           font-size: 1.2rem;
-          word-break: break-all;
-          // margin-left: 0.5rem;
+          margin-left: 0.5rem;
         }
       }
 
@@ -42,8 +42,6 @@ $S-color-green: #67C23A;
       }
 
       .SH-e {
-        margin-right: -0.5rem;
-        margin-left: 0.5rem;
         img {
           vertical-align: middle;
           width: 1.2rem;
@@ -119,7 +117,7 @@ $S-color-green: #67C23A;
           margin-right: 1rem;
           margin-bottom: 0.5rem;
           color: #333333;
-         word-break: break-all; 
+
           &::after {
             top: 50%;
             position: absolute;
@@ -189,15 +187,6 @@ $S-color-green: #67C23A;
         .van-button__text,
         .van-popover__wrapper {
           width: 100%;
-        }
-
-        /deep/.van-button::before {
-          background-color: transparent !important;
-          border-color: transparent !important;
-        }
-
-        /deep/.van-button::before {
-          background-color: #fff !important;
         }
 
         img {

@@ -11,11 +11,11 @@
         </div>
         <div class="common-popup-body">
           <van-form ref="ConsultHandOverForm" @submit="handleConfirm" :show-error-message="false" validate-trigger="onSubmit">
-            <RePick ref="overDepartRef" v-model="listQuery.handoverShellId" label="移交部门" :list="overDepartMentList" name="handoverShellId" isRequrie isCell :disabled="overDepartMentList.length === 1" />
+            <RePick ref="overDepartRef" v-model="listQuery.handoverShellId" label="移交部门" :list="overDepartMentList" name="handoverShellId" isRequrie isCell />
             <RePick ref="sysIdRef" v-model="listQuery.sysId" label="承接系统" :list="sysList" @change="handleSysId" name="sysId" isShowSearch isRequrie isCell />
-            <RePick ref="userIdRef" v-model="listQuery.userId" label="承接对象" :list="userList" @change="handleShell" name="userId" isShowSearch isRequrie isCell />
-            <RePick ref="shellIdRef" v-model="listQuery.shellId" label="承接部门" :list="shellList" name="shellId" isCascader isShowSearch isRequrie isCell :disabled="shellList.length === 1" />
-            <van-field v-if="isAlikeSys" label-width="10em" right readonly label="是否复制咨询记录">
+            <RePick ref="userIdRef" v-model="listQuery.userId" label="承接对象" :list="userList" @change="handleShell" name="userId" isRequrie isCell />
+            <RePick ref="shellIdRef" v-model="listQuery.shellId" label="承接部门" :list="shellList"  name="shellId" isCascader isShowSearch isRequrie isCell />
+            <van-field v-if="isAlikeSys" label-width="10em" right readonly label="是否复制咨询记录" >
               <template #button>
                 <van-switch size="20px" v-model="listQuery.copySearchRecord" />
               </template>
@@ -134,11 +134,6 @@ export default {
     handleOverList() {
       getDepsListApi(this.listQuery.student).then(res => {
         this.overDepartMentList = res.data || []
-        this.$nextTick(() => {
-          if (this.overDepartMentList.length === 1) {
-            this.listQuery.handoverShellId = this.overDepartMentList[0].id
-          }
-        })
       })
     },
 
@@ -153,27 +148,39 @@ export default {
       this.handleClearUser()
       if (!e) return
       this.$loading(true, 'ConsultHandOver')
-      handoveruserApi({ id: e, keyword: null, potentialStudentId: this.sId }).then(res => {
+      handoveruserApi({ id: e, keyword: null }).then(res => {
         this.userList = res.data || []
       }).finally(() => {
         this.$loading(false, 'ConsultHandOver')
       })
+      // shellBoxBySysApi({ id: e, list: this.listQuery.student }).then(res => {
+      //   this.shellList = res.data || []
+      //   if (this.shellList.length === 1) {
+      //     const children = this.shellList[0].children || []
+      //     if (!children.length) {
+      //       this.listQuery.shellId = this.shellList[0].id
+      //     }
+      //   }
+      // }).finally(() => {
+      //   this.$loading(false, 'ConsultHandOver')
+      // })
     },
 
     handleShell(e) {
+      // this.handleClearUser()
       this.handleClearDepartMent()
       if (!e) return
       this.$loading(true, 'ConsultHandOver')
-      handovershellApi(e, this.listQuery.sysId, this.sId).then(res => {
+      handovershellApi(e, this.listQuery.sysId).then(res => {
         this.shellList = res.data || []
-        this.$nextTick(() => {
-          if (this.shellList.length === 1) {
-            this.listQuery.shellId = this.shellList[0].id
-          }
-        })
       }).finally(() => {
         this.$loading(false, 'ConsultHandOver')
       })
+      // getUndertakingApi(e).then(res => {
+      //   this.userList = res.data || []
+      // }).finally(() => {
+      //   this.$loading(false, 'ConsultHandOver')
+      // })
     },
 
     handleClearDepartMent() {

@@ -201,10 +201,10 @@ export function activityQuesDetailApi(id) {
   })
 }
 
-// 活动-详情-问卷信息-头部信息 /问卷id/活动id
-export function activityQuesHeaderApi(id, activityId) {
+// 活动-详情-问卷信息-头部信息
+export function activityQuesHeaderApi(id) {
   return request({
-    url: `/market/question/newDetail/${id}/${activityId}`,
+    url: `/market/question/detail/${id}`,
     method: 'get',
   })
 }
@@ -516,17 +516,6 @@ export function targetShellBoxApi(sysId) {
     method: 'get'
   })
 }
-
-//参与人员添加潜在用户
-export function addPartPoUser(data, id) {
-  return request({
-    url: `market/activity/student/${id}`,
-    method: 'put',
-    data
-  })
-}
-
-
 
 
 

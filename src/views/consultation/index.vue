@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { menuPermissionUtil } from '@/utils'
 
 export default {
@@ -37,10 +38,18 @@ export default {
       counselTab: this.tab1 ? 'CounselUser' : this.tab2 ? 'NoCounsel' : this.tab3 ? 'CounselDistribute' : this.tab4 ? 'CounselSea' : null
     }
   },
+  created() {
+    this.handleInit()
+  },
   activated() {
     this.handleTabInit()
   },
   methods: {
+    ...mapActions('consultation', ['queryListAct']),
+
+    handleInit() {
+      this.queryListAct()
+    },
     handleTabInit() {
       let tab = this.$route.params.tab
       if (tab) {

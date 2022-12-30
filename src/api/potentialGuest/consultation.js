@@ -1,17 +1,18 @@
 import request from '@/plugin/axios'
 
-// 获取咨询用户 - 列表 - 更新用户信息
-export function consultationInfoApi(id, type) {
+// 获取咨询用户 - 列表
+export function consultationListApi(data) {
   return request({
-    url: `/market/potentialStudentReal/newDetail/${id}/${type}`,
-    method: 'get'
+    url: 'market/potentialStudentReal/page',
+    method: 'post',
+    data
   })
 }
 
-// 获取咨询用户 - 列表 - 更新用户信息(预约咨询)
-export function appointmentConsultationInfoApi(id) {
+// 获取咨询用户 - 列表 - 更新用户信息
+export function consultationInfoApi(id) {
   return request({
-    url: `/market/reserveConsult/newDetail/${id}`,
+    url: 'market/potentialStudentReal/newDetail/' + id,
     method: 'get'
   })
 }
@@ -208,9 +209,9 @@ export function handoveruserApi(data) {
 }
 
 // 获取系统关联事业部下所有市场、咨询用户
-export function handovershellApi(userId, sysInfoId, potentialStudentId) {
+export function handovershellApi(userId, sysInfoId) {
   return request({
-    url: `/market/handover/shell/${userId}/${sysInfoId}/${potentialStudentId}`,
+    url: `/market/handover/shell/${userId}/${sysInfoId}`,
     method: 'GET'
   })
 }

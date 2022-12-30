@@ -56,7 +56,7 @@
       </div>
     </div>
     <div>
-      <van-popup v-model="isPopupShow" position="bottom" round safe-area-inset-bottom lock-scroll lazy-render get-container="#app">
+      <van-popup v-model="isPopupShow" @open="handleOpen" position="bottom" round safe-area-inset-bottom lock-scroll lazy-render get-container="#app">
         <div class="Re-select-popup">
           <div class="Re-select-header">
             <div class="Re-select-header-cancel" @click="handleShow(false)">取消</div>
@@ -84,10 +84,10 @@
             </div>
           </div>
           <div class="Re-select-contain" style="height: 40vh">
-            <div v-if="!!showLimitList.length">
+            <div v-if="!!showList.length">
               <van-checkbox-group v-model="multipleValue" v-if="multiple">
                 <van-cell-group>
-                  <div v-for="item in showLimitList" :key="item.id" class="flex flex-c-center">
+                  <div v-for="item in showList" :key="item.id" class="flex flex-c-center">
                     <van-cell clickable @click="toggle(item.id, item)">
                       <template #title>
                         <div v-if="searchValue && isCascader" class="flex flex-c-center">
@@ -115,14 +115,11 @@
                       <van-button v-if="isCascader && !searchValue" :disabled="!item.children.length" type="info" size="small" class="nextBtn" @click="handleNext(item)">下级</van-button>
                     </div>
                   </div>
-                  <van-cell is-link arrow-direction="none" @click="handleMorePage" v-if="!isCascader && isUseLimitPage && showLimitList.length != showList.length">
-                    <div class="more-btn">加载更多...</div>
-                  </van-cell>
                 </van-cell-group>
               </van-checkbox-group>
               <van-radio-group v-model="selectValue" v-else>
                 <van-cell-group>
-                  <div v-for="item in showLimitList" :key="item.id" class="flex flex-c-center">
+                  <div v-for="item in showList" :key="item.id" class="flex flex-c-center">
                     <van-cell clickable @click="handleRadio(item.id, item)">
                       <template #title>
                         <div v-if="searchValue && isCascader" class="flex flex-c-center">
@@ -149,9 +146,6 @@
                     <div v-else>
                       <van-button v-if="isCascader && !searchValue" :disabled="!item.children.length" type="info" size="small" class="nextBtn" @click="handleNext(item)">下级</van-button>
                     </div>
-                    <van-cell is-link arrow-direction="none" @click="handleMorePage" v-if="!isCascader && isUseLimitPage && showLimitList.length != showList.length">
-                      <div class="more-btn">加载更多...</div>
-                    </van-cell>
                   </div>
                 </van-cell-group>
               </van-radio-group>
@@ -210,8 +204,6 @@ import { searchschoolApi, searchcollegelApi } from '@/api/common'
   * @param {String, Number, Array} value v-model
   * @param {Boolean} isOriginActivitySchoolSearch 是否活动远程学校
   * @param {String} emptyToastTitle 无数据提示语
-  * @param {Number} isUseLimitPage 是否启用加载更多
-  * @param {Number} limitPageSize 页码大小
 */
 export default {
   model: {
@@ -287,11 +279,6 @@ export default {
       type: String,
       default: '无可选数据'
     },
-    limitPageSize: {
-      type: Number,
-      default: 20
-    },
-    isUseLimitPage: Boolean
   },
   data() {
     return {
@@ -310,9 +297,7 @@ export default {
       searchList: [],
       // 远程搜索后，是否需要当前搜索
       isOriginAndCurrent: false,
-      originCurrentSchoolSearchValue: '',
-      limitPageNum: 1,
-      limitShow: this.isUseLimitPage
+      originCurrentSchoolSearchValue: ''
       // 初始化
       // isFirstInitList: true
     }
@@ -322,27 +307,20 @@ export default {
       return this.handleData(this.list, [])
     },
     showList() {
-      let info = []
       if (this.isCascader) {
         if (this.searchValue) {
+          const info = []
           this.handleSearchCascaderFind(this.allList, this.searchValue, info)
+          return info
         } else if (this.originCurrentSchoolSearchValue) {
+          // const info = []
           // this.handleSearchCascaderFind(this.currentList, this.originCurrentSchoolSearchValue, info)
-          info = this.currentList.filter(item => item[this.titleKey].indexOf(this.originCurrentSchoolSearchValue) > -1)
+          return this.currentList.filter(item => item[this.titleKey].indexOf(this.originCurrentSchoolSearchValue) > -1)
         } else {
-          info = this.currentList
+          return this.currentList
         }
       } else {
-        info = this.searchValue ? this.currentList.filter(item => item.title.indexOf(this.searchValue) > -1) : this.currentList
-      }
-      return info
-    },
-    showLimitList() {
-      if (this.searchValue || this.originCurrentSchoolSearchValue) return this.showList
-      if (!this.isCascader && this.isUseLimitPage) {
-        return this.showList.slice(0, this.limitPageNum * this.limitPageSize)
-      } else {
-        return this.showList
+        return this.searchValue ? this.currentList.filter(item => item.title.indexOf(this.searchValue) > -1) : this.currentList
       }
     },
     showValue() {
@@ -416,6 +394,9 @@ export default {
     this.handleDataInit()
   },
   methods: {
+    handleOpen() {
+      this.$emit('open')
+    },
     titleFilterFun(arr) {
       return arr.map(item => item.title || item).join('、')
     },
@@ -713,11 +694,7 @@ export default {
           this.originLoading = false
         })
       }
-    }, 1000, false),
-
-    handleMorePage() {
-      this.limitPageNum += 1
-    }
+    }, 1000, false)
 
   }
 }

@@ -291,15 +291,6 @@ $S-color-green: #67C23A;
         width: 100%;
       }
 
-      /deep/.van-button::before {
-        background-color: transparent !important;
-        border-color: transparent !important;
-      }
-
-      /deep/.van-button::before {
-        background-color: #fff !important;
-      }
-
       img {
         width: 1rem;
         height: auto;
